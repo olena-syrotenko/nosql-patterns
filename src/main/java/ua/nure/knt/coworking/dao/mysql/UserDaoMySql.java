@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class UserDaoMySql implements UserDao {
@@ -84,17 +83,16 @@ public class UserDaoMySql implements UserDao {
 				users.add(extractUserFromResultSet(rs));
 			}
 			rs.close();
-			connection.close();
 			return users;
 		} catch (SQLException exception) {
-			return Collections.emptyList();
+			return null;
 		} finally {
 			connection.close();
 		}
 	}
 
 	@Override
-	public int createUser(User user) throws SQLException {
+	public Integer createUser(User user) throws SQLException {
 		try {
 			PreparedStatement ps = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, user.getEmail());
@@ -106,20 +104,23 @@ public class UserDaoMySql implements UserDao {
 			ps.setString(7, user.getRole()
 					.getName());
 			ps.executeUpdate();
+
 			ResultSet keys = ps.getGeneratedKeys();
-			if(keys.next()){
+			if (keys.next()) {
 				return keys.getInt(1);
 			}
+			keys.close();
+			ps.close();
 			return 0;
 		} catch (SQLException exception) {
-			return 0;
+			return null;
 		} finally {
 			connection.close();
 		}
 	}
 
 	@Override
-	public int updateUser(User user) throws SQLException {
+	public Integer updateUser(User user) throws SQLException {
 		try {
 			PreparedStatement ps = connection.prepareStatement(UPDATE_USER_BY_ID);
 			ps.setString(1, user.getEmail());
@@ -129,9 +130,12 @@ public class UserDaoMySql implements UserDao {
 			ps.setString(5, user.getPassportId());
 			ps.setString(6, user.getPhoneNumber());
 			ps.setInt(7, user.getId());
-			return ps.executeUpdate();
+
+			int updatedRows = ps.executeUpdate();
+			ps.close();
+			return updatedRows;
 		} catch (SQLException exception) {
-			return 0;
+			return null;
 		} finally {
 			connection.close();
 		}

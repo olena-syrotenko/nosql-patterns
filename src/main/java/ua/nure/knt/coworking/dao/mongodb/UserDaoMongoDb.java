@@ -22,12 +22,12 @@ public class UserDaoMongoDb implements UserDao {
 	}
 
 	@Override
-	public int createUser(User user) {
+	public Integer createUser(User user) {
 		return 0;
 	}
 
 	@Override
-	public int updateUser(User user) {
+	public Integer updateUser(User user) {
 		return 0;
 	}
 }

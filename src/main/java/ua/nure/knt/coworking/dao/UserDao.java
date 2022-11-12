@@ -12,7 +12,7 @@ public interface UserDao {
 
 	List<User> readAllUsers() throws SQLException;
 
-	int createUser(User user) throws SQLException;
+	Integer createUser(User user) throws SQLException;
 
-	int updateUser(User user) throws SQLException;
+	Integer updateUser(User user) throws SQLException;
 }
