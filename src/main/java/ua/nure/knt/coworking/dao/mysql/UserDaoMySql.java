@@ -16,10 +16,6 @@ import java.util.List;
 public class UserDaoMySql implements UserDao {
 	private final Connection connection;
 
-	public UserDaoMySql(Connection connection) {
-		this.connection = connection;
-	}
-
 	// READ
 	private static final String GET_USER_BY_EMAIL = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE email = ?";
 	private static final String GET_USER_BY_ID = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE id = ?";
@@ -30,6 +26,10 @@ public class UserDaoMySql implements UserDao {
 
 	// UPDATE
 	private static final String UPDATE_USER_BY_ID = "SET email = ?, password = ?, last_name = ?, first_name = ?, passport_id = ?, phone_number = ? WHERE id = ?";
+
+	public UserDaoMySql(Connection connection) {
+		this.connection = connection;
+	}
 
 	@Override
 	public User readUserByEmail(String email) throws SQLException {
