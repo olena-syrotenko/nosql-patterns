@@ -1,6 +1,7 @@
 package ua.nure.knt.coworking.dao.mysql;
 
 import ua.nure.knt.coworking.dao.DaoFactory;
+import ua.nure.knt.coworking.dao.PlaceDao;
 import ua.nure.knt.coworking.dao.UserDao;
 
 import java.sql.Connection;
@@ -32,5 +33,10 @@ public class DaoFactoryMySql extends DaoFactory {
 	@Override
 	public UserDao getUserDao() throws SQLException {
 		return new UserDaoMySql(getConnection());
+	}
+
+	@Override
+	public PlaceDao getPlaceDao() throws SQLException {
+		return new PlaceDaoMySql(getConnection());
 	}
 }
