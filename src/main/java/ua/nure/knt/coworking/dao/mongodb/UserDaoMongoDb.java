@@ -3,6 +3,8 @@ package ua.nure.knt.coworking.dao.mongodb;
 import ua.nure.knt.coworking.dao.UserDao;
 import ua.nure.knt.coworking.entity.User;
 
+import java.util.List;
+
 public class UserDaoMongoDb implements UserDao {
 	@Override
 	public User readUserByEmail(String email) {
@@ -15,12 +17,17 @@ public class UserDaoMongoDb implements UserDao {
 	}
 
 	@Override
-	public boolean createUser(User user) {
-		return false;
+	public List<User> readAllUsers() {
+		return null;
 	}
 
 	@Override
-	public boolean updateUser(User user) {
-		return false;
+	public int createUser(User user) {
+		return 0;
+	}
+
+	@Override
+	public int updateUser(User user) {
+		return 0;
 	}
 }

@@ -1,6 +1,7 @@
-package ua.nure.knt.coworking.dao;
+package ua.nure.knt.coworking.dao.mysql;
 
-import ua.nure.knt.coworking.dao.mysql.UserDaoMySql;
+import ua.nure.knt.coworking.dao.DaoFactory;
+import ua.nure.knt.coworking.dao.UserDao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,7 +11,7 @@ import java.util.Properties;
 public class DaoFactoryMySql extends DaoFactory {
 	private static Properties connectionInfo;
 
-	DaoFactoryMySql() {
+	public DaoFactoryMySql() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 		} catch (ClassNotFoundException e) {

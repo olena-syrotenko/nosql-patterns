@@ -1,5 +1,8 @@
 package ua.nure.knt.coworking.dao;
 
+import ua.nure.knt.coworking.dao.mongodb.DaoFactoryMongoDb;
+import ua.nure.knt.coworking.dao.mysql.DaoFactoryMySql;
+
 import java.sql.SQLException;
 
 public abstract class DaoFactory {
@@ -15,5 +18,5 @@ public abstract class DaoFactory {
 		return daoFactory;
 	}
 
-	abstract UserDao getUserDao() throws SQLException;
+	public abstract UserDao getUserDao() throws SQLException;
 }
