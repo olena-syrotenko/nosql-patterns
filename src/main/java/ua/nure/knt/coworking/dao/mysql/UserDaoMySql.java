@@ -19,14 +19,14 @@ public class UserDaoMySql implements UserDao {
 
 	// READ
 	private static final String GET_USER_BY_EMAIL = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE email = ?";
-	private static final String GET_USER_BY_ID = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE id = ?";
+	private static final String GET_USER_BY_ID = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE user.id = ?";
 	private static final String GET_ALL_USERS = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE role.name = 'ROLE_USER'";
 
 	// CREATE
 	private static final String INSERT_USER = "INSERT INTO user VALUES(null,?,?,?,?,?,?, (SELECT id FROM role WHERE name = ?))";
 
 	// UPDATE
-	private static final String UPDATE_USER_BY_ID = "SET email = ?, password = ?, last_name = ?, first_name = ?, passport_id = ?, phone_number = ? WHERE id = ?";
+	private static final String UPDATE_USER_BY_ID = "UPDATE user SET email = ?, password = ?, last_name = ?, first_name = ?, passport_id = ?, phone_number = ? WHERE id = ?";
 
 	public UserDaoMySql(Connection connection) {
 		this.connection = connection;
@@ -96,7 +96,7 @@ public class UserDaoMySql implements UserDao {
 	@Override
 	public int createUser(User user) throws SQLException {
 		try {
-			PreparedStatement ps = connection.prepareStatement(INSERT_USER);
+			PreparedStatement ps = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, user.getEmail());
 			ps.setString(2, user.getPassword());
 			ps.setString(3, user.getLastName());
@@ -105,7 +105,12 @@ public class UserDaoMySql implements UserDao {
 			ps.setString(6, user.getPhoneNumber());
 			ps.setString(7, user.getRole()
 					.getName());
-			return ps.executeUpdate();
+			ps.executeUpdate();
+			ResultSet keys = ps.getGeneratedKeys();
+			if(keys.next()){
+				return keys.getInt(1);
+			}
+			return 0;
 		} catch (SQLException exception) {
 			return 0;
 		} finally {
