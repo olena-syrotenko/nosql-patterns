@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class UserDaoMySql implements UserDao {
@@ -33,76 +34,102 @@ public class UserDaoMySql implements UserDao {
 
 	@Override
 	public User readUserByEmail(String email) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement(GET_USER_BY_EMAIL);
-		ps.setString(1, email);
-		ResultSet rs = ps.executeQuery();
-		User user = null;
-		if (rs.next()) {
-			user = extractUserFromResultSet(rs);
+		try {
+			PreparedStatement ps = connection.prepareStatement(GET_USER_BY_EMAIL);
+			ps.setString(1, email);
+
+			ResultSet rs = ps.executeQuery();
+
+			User user = null;
+			if (rs.next()) {
+				user = extractUserFromResultSet(rs);
+			}
+			rs.close();
+			ps.close();
+			return user;
+		} catch (SQLException exception) {
+			return null;
+		} finally {
+			connection.close();
 		}
-		rs.close();
-		ps.close();
-		connection.close();
-		return user;
 	}
 
 	@Override
 	public User readUserById(Integer id) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement(GET_USER_BY_ID);
-		ps.setInt(1, id);
-		ResultSet rs = ps.executeQuery();
-		User user = null;
-		if (rs.next()) {
-			user = extractUserFromResultSet(rs);
+		try {
+			PreparedStatement ps = connection.prepareStatement(GET_USER_BY_ID);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			User user = null;
+			if (rs.next()) {
+				user = extractUserFromResultSet(rs);
+			}
+			rs.close();
+			ps.close();
+			return user;
+		} catch (SQLException exception) {
+			return null;
+		} finally {
+			connection.close();
 		}
-		rs.close();
-		ps.close();
-		connection.close();
-		return user;
 	}
 
 	@Override
 	public List<User> readAllUsers() throws SQLException {
-		Statement st = connection.createStatement();
-		ResultSet rs = st.executeQuery(GET_ALL_USERS);
-		ArrayList<User> users = new ArrayList<>();
-		while (rs.next()) {
-			users.add(extractUserFromResultSet(rs));
+		try {
+			Statement st = connection.createStatement();
+			ResultSet rs = st.executeQuery(GET_ALL_USERS);
+			ArrayList<User> users = new ArrayList<>();
+			while (rs.next()) {
+				users.add(extractUserFromResultSet(rs));
+			}
+			rs.close();
+			connection.close();
+			return users;
+		} catch (SQLException exception) {
+			return Collections.emptyList();
+		} finally {
+			connection.close();
 		}
-		rs.close();
-		connection.close();
-		return users;
 	}
 
 	@Override
 	public int createUser(User user) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement(INSERT_USER);
-		ps.setString(1, user.getEmail());
-		ps.setString(2, user.getPassword());
-		ps.setString(3, user.getLastName());
-		ps.setString(4, user.getFirstName());
-		ps.setString(5, user.getPassportId());
-		ps.setString(6, user.getPhoneNumber());
-		ps.setString(7, user.getRole()
-				.getName());
-		int updatedRows = ps.executeUpdate();
-		connection.close();
-		return updatedRows;
+		try {
+			PreparedStatement ps = connection.prepareStatement(INSERT_USER);
+			ps.setString(1, user.getEmail());
+			ps.setString(2, user.getPassword());
+			ps.setString(3, user.getLastName());
+			ps.setString(4, user.getFirstName());
+			ps.setString(5, user.getPassportId());
+			ps.setString(6, user.getPhoneNumber());
+			ps.setString(7, user.getRole()
+					.getName());
+			return ps.executeUpdate();
+		} catch (SQLException exception) {
+			return 0;
+		} finally {
+			connection.close();
+		}
 	}
 
 	@Override
 	public int updateUser(User user) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement(UPDATE_USER_BY_ID);
-		ps.setString(1, user.getEmail());
-		ps.setString(2, user.getPassword());
-		ps.setString(3, user.getLastName());
-		ps.setString(4, user.getFirstName());
-		ps.setString(5, user.getPassportId());
-		ps.setString(6, user.getPhoneNumber());
-		ps.setInt(7, user.getId());
-		int updatedRows = ps.executeUpdate();
-		connection.close();
-		return updatedRows;
+		try {
+			PreparedStatement ps = connection.prepareStatement(UPDATE_USER_BY_ID);
+			ps.setString(1, user.getEmail());
+			ps.setString(2, user.getPassword());
+			ps.setString(3, user.getLastName());
+			ps.setString(4, user.getFirstName());
+			ps.setString(5, user.getPassportId());
+			ps.setString(6, user.getPhoneNumber());
+			ps.setInt(7, user.getId());
+			return ps.executeUpdate();
+		} catch (SQLException exception) {
+			return 0;
+		} finally {
+			connection.close();
+		}
 	}
 
 	private User extractUserFromResultSet(ResultSet rs) throws SQLException {
