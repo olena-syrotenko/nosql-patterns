@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TariffDaoMySql implements TariffDao {
 	private final Connection connection;
@@ -62,7 +63,7 @@ public class TariffDaoMySql implements TariffDao {
 	public List<Tariff> readTariffByRoomType(String roomTypeName) throws SQLException {
 		try {
 			PreparedStatement ps = connection.prepareStatement(GET_TARIFF_BY_ROOM_TYPE_NAME);
-			ps.setString(1, roomTypeName);
+			ps.setString(1, roomTypeName.toLowerCase(Locale.ROOT));
 			ResultSet rs = ps.executeQuery();
 			List<Tariff> tariffs = extractTariffListFromResultSet(rs);
 			rs.close();
@@ -79,7 +80,7 @@ public class TariffDaoMySql implements TariffDao {
 	public List<Tariff> readTariffByTimeUnit(String timeUnit) throws SQLException {
 		try {
 			PreparedStatement ps = connection.prepareStatement(GET_TARIFF_BY_TIME_UNIT);
-			ps.setString(1, timeUnit);
+			ps.setString(1, timeUnit.toLowerCase(Locale.ROOT));
 			ResultSet rs = ps.executeQuery();
 			List<Tariff> tariffs = extractTariffListFromResultSet(rs);
 			rs.close();
@@ -158,19 +159,25 @@ public class TariffDaoMySql implements TariffDao {
 			int updatedRows = ps.executeUpdate();
 			ps.close();
 
-			List<Service> services = readTariffServiceByTariffId(tariff.getId());
+			List<String> services = readTariffServiceByTariffId(tariff.getId()).stream()
+					.map(Service::getName)
+					.toList();
+			List<String> updateServices = tariff.getServices()
+					.stream()
+					.map(Service::getName)
+					.toList();
 			if (CollectionUtils.isNotEmpty(services)) {
-				List<Service> toInsert = CollectionUtils.subtract(tariff.getServices(), services)
+				List<String> toInsert = CollectionUtils.subtract(updateServices, services)
 						.stream()
 						.toList();
-				for(Service service : toInsert){
-					updatedRows += createTariffService(tariff.getId(), service.getName());
+				for (String service : toInsert) {
+					updatedRows += createTariffService(tariff.getId(), service);
 				}
-				List<Service> toDelete = CollectionUtils.subtract(services, tariff.getServices())
+				List<String> toDelete = CollectionUtils.subtract(services, updateServices)
 						.stream()
 						.toList();
-				for(Service service : toDelete){
-					updatedRows += deleteTariffService(tariff.getId(), service.getName());
+				for (String service : toDelete) {
+					updatedRows += deleteTariffService(tariff.getId(), service);
 				}
 			}
 
