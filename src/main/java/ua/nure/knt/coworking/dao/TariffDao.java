@@ -1,6 +1,5 @@
 package ua.nure.knt.coworking.dao;
 
-import ua.nure.knt.coworking.entity.Service;
 import ua.nure.knt.coworking.entity.Tariff;
 
 import java.sql.SQLException;
@@ -17,11 +16,7 @@ public interface TariffDao {
 
 	Integer createTariff(Tariff tariff) throws SQLException;
 
-	//Integer addTariffService(Service service) throws SQLException;
-
 	Integer updateTariff(Tariff tariff) throws SQLException;
 
 	Integer deleteTariffById(Integer id) throws SQLException;
-
-	//Integer removeTariffService(Service service) throws SQLException;
 }
