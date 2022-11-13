@@ -125,7 +125,7 @@ public class PlaceDaoMySql implements PlaceDao {
 	@Override
 	public Integer updatePlace(Place place) throws SQLException {
 		try {
-			PreparedStatement ps = connection.prepareStatement(UPDATE_PLACE, Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement ps = connection.prepareStatement(UPDATE_PLACE);
 			ps.setDouble(1, place.getArea());
 			ps.setInt(2, place.getId());
 
@@ -142,7 +142,7 @@ public class PlaceDaoMySql implements PlaceDao {
 	@Override
 	public Integer deletePlaceById(Integer id) throws SQLException {
 		try {
-			PreparedStatement ps = connection.prepareStatement(DELETE_PLACE_BY_ID, Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement ps = connection.prepareStatement(DELETE_PLACE_BY_ID);
 			ps.setInt(1, id);
 
 			int deletedRows = ps.executeUpdate();
