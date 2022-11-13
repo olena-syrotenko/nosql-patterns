@@ -2,6 +2,7 @@ package ua.nure.knt.coworking.dao.mysql;
 
 import ua.nure.knt.coworking.dao.DaoFactory;
 import ua.nure.knt.coworking.dao.PlaceDao;
+import ua.nure.knt.coworking.dao.RentDao;
 import ua.nure.knt.coworking.dao.TariffDao;
 import ua.nure.knt.coworking.dao.UserDao;
 
@@ -44,5 +45,10 @@ public class DaoFactoryMySql extends DaoFactory {
 	@Override
 	public TariffDao getTariffDao() throws SQLException {
 		return new TariffDaoMySql(getConnection());
+	}
+
+	@Override
+	public RentDao getRentDao() throws SQLException {
+		return new RentDaoMySql(getConnection());
 	}
 }

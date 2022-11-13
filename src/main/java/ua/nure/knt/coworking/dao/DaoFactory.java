@@ -21,4 +21,5 @@ public abstract class DaoFactory {
 	public abstract UserDao getUserDao() throws SQLException;
 	public abstract PlaceDao getPlaceDao() throws SQLException;
 	public abstract TariffDao getTariffDao() throws SQLException;
+	public abstract RentDao getRentDao() throws SQLException;
 }
