@@ -148,10 +148,11 @@ public class RentDaoMySql implements RentDao {
 	}
 
 	@Override
-	public Integer updateRentApplicationStatus(StatusEnum statusEnum) throws SQLException {
+	public Integer updateRentApplicationStatus(RentApplication rentApplication) throws SQLException {
 		try {
 			PreparedStatement ps = connection.prepareStatement(UPDATE_RENT_APPLICATION_STATUS);
-			ps.setString(1, statusEnum.getStatus());
+			ps.setString(1, rentApplication.getStatus().getName());
+			ps.setInt(2, rentApplication.getId());
 			int updatedRows = ps.executeUpdate();
 			ps.close();
 			return updatedRows;
@@ -205,8 +206,8 @@ public class RentDaoMySql implements RentDao {
 						.toLocalDate())
 				.setRentAmount(rs.getDouble(6))
 				.setTariff(new TariffBuilder().setName(rs.getString(7))
-						.setPrice(rs.getDouble(7))
-						.setTimeUnit(new TimeUnitBuilder().setName(rs.getString(8))
+						.setPrice(rs.getDouble(8))
+						.setTimeUnit(new TimeUnitBuilder().setName(rs.getString(9))
 								.build())
 						.build())
 				.build();

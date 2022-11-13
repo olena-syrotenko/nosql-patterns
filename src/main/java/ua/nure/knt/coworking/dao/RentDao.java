@@ -12,5 +12,5 @@ public interface RentDao {
 	List<RentApplication> readAllRentApplicationByUserAndStatus(String userEmail, StatusEnum statusEnum) throws SQLException;
 	RentApplication readRentApplicationById(Integer id) throws SQLException;
 	Integer createRentApplication(RentApplication rentApplication) throws SQLException;
-	Integer updateRentApplicationStatus(StatusEnum statusEnum) throws SQLException;
+	Integer updateRentApplicationStatus(RentApplication rentApplication) throws SQLException;
 }
