@@ -166,19 +166,18 @@ public class TariffDaoMySql implements TariffDao {
 					.stream()
 					.map(Service::getName)
 					.toList();
-			if (CollectionUtils.isNotEmpty(services)) {
-				List<String> toInsert = CollectionUtils.subtract(updateServices, services)
-						.stream()
-						.toList();
-				for (String service : toInsert) {
-					updatedRows += createTariffService(tariff.getId(), service);
-				}
-				List<String> toDelete = CollectionUtils.subtract(services, updateServices)
-						.stream()
-						.toList();
-				for (String service : toDelete) {
-					updatedRows += deleteTariffService(tariff.getId(), service);
-				}
+
+			List<String> toInsert = CollectionUtils.subtract(updateServices, services)
+					.stream()
+					.toList();
+			for (String service : toInsert) {
+				updatedRows += createTariffService(tariff.getId(), service);
+			}
+			List<String> toDelete = CollectionUtils.subtract(services, updateServices)
+					.stream()
+					.toList();
+			for (String service : toDelete) {
+				updatedRows += deleteTariffService(tariff.getId(), service);
 			}
 
 			connection.commit();
