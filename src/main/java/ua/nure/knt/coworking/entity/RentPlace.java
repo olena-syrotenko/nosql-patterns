@@ -1,5 +1,7 @@
 package ua.nure.knt.coworking.entity;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.LocalDate;
 
 public class RentPlace {
@@ -51,8 +53,8 @@ public class RentPlace {
 
 	@Override
 	public String toString() {
-		return "RentPlace{" + "place=№" + place.getId() + " in room №" + place.getRoom().getId() + " " + place.getRoom().getName()
-				+ ", rentStart=" + rentStart + ", rentEnd=" + rentEnd + ", rentAmount=" + rentAmount + ", tariff=" + tariff.getName()
-				+ " " + tariff.getPrice() + "/" + tariff.getTimeUnit().getName() + '}';
+		return "RentPlace{" + "place=№" + place.getId() + " in room №" + place.getRoom()
+				.getId() + " " + StringUtils.defaultIfBlank(place.getRoom()
+				.getName(), "") + ", rentStart=" + rentStart + ", rentEnd=" + rentEnd + ", rentAmount=" + rentAmount + ", tariff=" + tariff.getName() + '}';
 	}
 }

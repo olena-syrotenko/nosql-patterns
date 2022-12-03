@@ -34,6 +34,6 @@ public class DaoFactoryMongoDb extends DaoFactory {
 
 	@Override
 	public RentDao getRentDao() throws SQLException {
-		return null;
+		return new RentDaoMongoDb(getMongoClient());
 	}
 }
