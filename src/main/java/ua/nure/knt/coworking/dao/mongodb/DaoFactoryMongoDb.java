@@ -19,7 +19,7 @@ public class DaoFactoryMongoDb extends DaoFactory {
 
 	@Override
 	public UserDao getUserDao() {
-		return null;
+		return new UserDaoMongoDb(getMongoClient());
 	}
 
 	@Override

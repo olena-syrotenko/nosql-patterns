@@ -1,8 +1,8 @@
 package ua.nure.knt.coworking.dao.mongodb;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -22,28 +22,31 @@ import java.util.List;
 import static com.mongodb.client.model.Filters.eq;
 
 public class PlaceDaoMongoDb implements PlaceDao {
-	private final MongoCollection<Document> placeCollection;
+	private static final String PLACE_COLLECTION = "place";
+	private final MongoDatabase database;
 
 	public PlaceDaoMongoDb(MongoClient mongoClient) {
-		this.placeCollection = mongoClient.getDatabase("coworking")
-				.getCollection("place");
+		this.database = mongoClient.getDatabase("coworking");
 	}
 
 	@Override
 	public List<Place> readPlaceByRoomName(String roomName) throws SQLException {
-		MongoCursor<Document> documentsCursor = placeCollection.find(eq("room.name", roomName))
+		MongoCursor<Document> documentsCursor = database.getCollection(PLACE_COLLECTION)
+				.find(eq("room.name", roomName))
 				.cursor();
 		return extractPlaceListFromDocuments(documentsCursor);
 	}
 
 	@Override
 	public List<Place> readAvailablePlace(LocalDate dateFrom, LocalDate dateTo, Integer idRoomType) throws SQLException {
+		// TODO
 		return null;
 	}
 
 	@Override
 	public Place readPlaceById(Integer id) throws SQLException {
-		Document document = placeCollection.find(eq("number", id))
+		Document document = database.getCollection(PLACE_COLLECTION)
+				.find(eq("number", id))
 				.first();
 		return document == null ? null : extractPlaceFromDocument(document);
 	}
@@ -53,7 +56,8 @@ public class PlaceDaoMongoDb implements PlaceDao {
 		if (place == null) {
 			return null;
 		}
-		placeCollection.insertOne(extractDocumentFromPlace(place));
+		database.getCollection(PLACE_COLLECTION)
+				.insertOne(extractDocumentFromPlace(place));
 		return place.getId();
 	}
 
@@ -62,17 +66,19 @@ public class PlaceDaoMongoDb implements PlaceDao {
 		if (place == null) {
 			return null;
 		}
-		UpdateResult updateResult = placeCollection.updateMany(eq("number", place.getId()), extractUpdatesFromPlace(place));
+		UpdateResult updateResult = database.getCollection(PLACE_COLLECTION)
+				.updateMany(eq("number", place.getId()), extractUpdatesFromPlace(place));
 		return Math.toIntExact(updateResult.getModifiedCount());
 	}
 
 	@Override
 	public Integer deletePlaceById(Integer id) throws SQLException {
-		DeleteResult deleteResult = placeCollection.deleteMany(eq("number", id));
+		DeleteResult deleteResult = database.getCollection(PLACE_COLLECTION)
+				.deleteMany(eq("number", id));
 		return Math.toIntExact(deleteResult.getDeletedCount());
 	}
 
-	private List<Place> extractPlaceListFromDocuments(MongoCursor<Document> documentsCursor) throws SQLException {
+	private List<Place> extractPlaceListFromDocuments(MongoCursor<Document> documentsCursor) {
 		ArrayList<Place> places = new ArrayList<>();
 		while (documentsCursor.hasNext()) {
 			places.add(extractPlaceFromDocument(documentsCursor.next()));
@@ -80,7 +86,7 @@ public class PlaceDaoMongoDb implements PlaceDao {
 		return places;
 	}
 
-	private Place extractPlaceFromDocument(Document document) throws SQLException {
+	private Place extractPlaceFromDocument(Document document) {
 		Document roomDocument = document.get("room", Document.class);
 		return new PlaceBuilder().setId(document.getInteger("number"))
 				.setArea(document.getDouble("area"))
