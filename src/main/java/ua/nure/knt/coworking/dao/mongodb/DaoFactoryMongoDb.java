@@ -29,7 +29,7 @@ public class DaoFactoryMongoDb extends DaoFactory {
 
 	@Override
 	public TariffDao getTariffDao() throws SQLException {
-		return null;
+		return new TariffDaoMongoDb(getMongoClient());
 	}
 
 	@Override

@@ -69,7 +69,7 @@ public class UserDaoMongoDb implements UserDao {
 	public Integer updateUser(User user) throws SQLException {
 		UpdateResult updateResult = database.getCollection(USER_COLLECTION)
 				.updateOne(eq("email", user.getEmail()), extractUpdatesFromUser(user));
-		return null;
+		return Math.toIntExact(updateResult.getModifiedCount());
 	}
 
 	private List<User> extractUserListFromDocuments(MongoCursor<Document> documentsCursor) {
