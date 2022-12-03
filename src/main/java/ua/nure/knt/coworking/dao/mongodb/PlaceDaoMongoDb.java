@@ -8,6 +8,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import ua.nure.knt.coworking.constants.StatusEnum;
 import ua.nure.knt.coworking.dao.PlaceDao;
 import ua.nure.knt.coworking.entity.Place;
 import ua.nure.knt.coworking.util.PlaceBuilder;
@@ -16,13 +17,22 @@ import ua.nure.knt.coworking.util.RoomTypeBuilder;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gte;
+import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.ne;
+import static com.mongodb.client.model.Filters.or;
 
 public class PlaceDaoMongoDb implements PlaceDao {
 	private static final String PLACE_COLLECTION = "place";
+	private static final String RENT_COLLECTION = "rent_application";
 	private final MongoDatabase database;
 
 	public PlaceDaoMongoDb(MongoClient mongoClient) {
@@ -39,8 +49,19 @@ public class PlaceDaoMongoDb implements PlaceDao {
 
 	@Override
 	public List<Place> readAvailablePlace(LocalDate dateFrom, LocalDate dateTo, Integer idRoomType) throws SQLException {
-		// TODO
-		return null;
+		List<Place> places = extractPlaceListFromDocuments(database.getCollection(PLACE_COLLECTION)
+				.find()
+				.cursor());
+		List<Integer> rentedPlaces = extractPlaceNumberListFromDocuments(database.getCollection(RENT_COLLECTION)
+				.find(and(or(ne("status", StatusEnum.CANCELLED), ne("status", StatusEnum.REJECTED)), lte("places.rent_start", Date.from(dateTo.atStartOfDay()
+						.atZone(ZoneId.systemDefault())
+						.toInstant())), gte("places.rent_end", Date.from(dateFrom.atStartOfDay()
+						.atZone(ZoneId.systemDefault())
+						.toInstant()))))
+				.cursor());
+		return places.stream()
+				.filter(place -> !rentedPlaces.contains(place.getId()))
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -84,6 +105,18 @@ public class PlaceDaoMongoDb implements PlaceDao {
 			places.add(extractPlaceFromDocument(documentsCursor.next()));
 		}
 		return places;
+	}
+
+	private List<Integer> extractPlaceNumberListFromDocuments(MongoCursor<Document> documentsCursor) {
+		ArrayList<Integer> placeNumbers = new ArrayList<>();
+		while (documentsCursor.hasNext()) {
+			placeNumbers.addAll(documentsCursor.next()
+					.getList("places", Document.class)
+					.stream()
+					.map(place -> place.getInteger("place_number"))
+					.toList());
+		}
+		return placeNumbers;
 	}
 
 	private Place extractPlaceFromDocument(Document document) {
