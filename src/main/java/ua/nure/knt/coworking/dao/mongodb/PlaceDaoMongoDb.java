@@ -74,9 +74,6 @@ public class PlaceDaoMongoDb implements PlaceDao {
 
 	@Override
 	public Integer createPlace(Place place) throws SQLException {
-		if (place == null) {
-			return null;
-		}
 		database.getCollection(PLACE_COLLECTION)
 				.insertOne(extractDocumentFromPlace(place));
 		return place.getId();
@@ -84,9 +81,6 @@ public class PlaceDaoMongoDb implements PlaceDao {
 
 	@Override
 	public Integer updatePlace(Place place) throws SQLException {
-		if (place == null) {
-			return null;
-		}
 		UpdateResult updateResult = database.getCollection(PLACE_COLLECTION)
 				.updateMany(eq("number", place.getId()), extractUpdatesFromPlace(place));
 		return Math.toIntExact(updateResult.getModifiedCount());

@@ -85,9 +85,6 @@ public class RentDaoMongoDb implements RentDao {
 
 	@Override
 	public Integer updateRentApplicationStatus(RentApplication rentApplication) throws SQLException {
-		if (rentApplication == null) {
-			return null;
-		}
 		UpdateResult updateResult = database.getCollection(RENT_COLLECTION)
 				.updateMany(eq("number", rentApplication.getId()), Updates.combine(Updates.set("last_change", convertToDate(LocalDateTime.now())),
 						Updates.set("status", rentApplication.getStatus()
