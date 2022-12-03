@@ -28,7 +28,7 @@ public class DaoFactoryMySql extends DaoFactory {
 		connectionInfo.put("serverTimezone", "UTC");
 	}
 
-	private Connection getConnection() throws SQLException {
+	private static Connection getConnection() throws SQLException {
 		return DriverManager.getConnection("jdbc:mysql://localhost/coworking_db", connectionInfo);
 	}
 
