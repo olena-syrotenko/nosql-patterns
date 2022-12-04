@@ -15,8 +15,11 @@ import ua.nure.knt.coworking.util.UserBuilder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Sorts.descending;
 
 public class UserDaoMongoDb implements UserDao {
@@ -52,6 +55,14 @@ public class UserDaoMongoDb implements UserDao {
 	}
 
 	@Override
+	public List<User> readUsersByFullName(String lastName, String firstName) throws SQLException {
+		MongoCursor<Document> usersCursor = database.getCollection(USER_COLLECTION)
+				.find(and(eq("last_name", lastName), eq("first_name", firstName)))
+				.cursor();
+		return extractUserListFromDocuments(usersCursor);
+	}
+
+	@Override
 	public Integer createUser(User user) throws SQLException {
 		Document lastId = database.getCollection(USER_COLLECTION)
 				.find()
@@ -70,6 +81,21 @@ public class UserDaoMongoDb implements UserDao {
 		UpdateResult updateResult = database.getCollection(USER_COLLECTION)
 				.updateOne(eq("email", user.getEmail()), extractUpdatesFromUser(user));
 		return Math.toIntExact(updateResult.getModifiedCount());
+	}
+
+	@Override
+	public void deleteUsers() throws SQLException {
+		database.getCollection(USER_COLLECTION)
+				.deleteMany(gte("id", 0));
+	}
+
+	@Override
+	public Integer migrate(List<User> users) throws SQLException {
+		database.getCollection(USER_COLLECTION)
+				.insertMany(users.stream()
+						.map(this::extractDocumentFromUser)
+						.collect(Collectors.toList()));
+		return users.size();
 	}
 
 	private List<User> extractUserListFromDocuments(MongoCursor<Document> documentsCursor) {

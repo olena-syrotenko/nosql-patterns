@@ -38,6 +38,14 @@ public class RentDaoMongoDb implements RentDao {
 	}
 
 	@Override
+	public List<RentApplication> readAllRentApplication() throws SQLException {
+		MongoCursor<Document> rentApplicationsCursor = database.getCollection(RENT_COLLECTION)
+				.find()
+				.cursor();
+		return extractRentApplicationListFromDocuments(rentApplicationsCursor);
+	}
+
+	@Override
 	public List<RentApplication> readAllRentApplicationByStatus(StatusEnum statusEnum) throws SQLException {
 		MongoCursor<Document> rentApplicationsCursor = database.getCollection(RENT_COLLECTION)
 				.find(eq("status", statusEnum.getStatus()))
@@ -90,6 +98,15 @@ public class RentDaoMongoDb implements RentDao {
 						Updates.set("status", rentApplication.getStatus()
 								.getName())));
 		return Math.toIntExact(updateResult.getModifiedCount());
+	}
+
+	@Override
+	public Integer migrate(List<RentApplication> rentApplications) throws SQLException {
+		database.getCollection(RENT_COLLECTION)
+				.insertMany(rentApplications.stream()
+						.map(this::extractDocumentFromRentApplication)
+						.collect(Collectors.toList()));
+		return rentApplications.size();
 	}
 
 	private List<RentApplication> extractRentApplicationListFromDocuments(MongoCursor<Document> documentsCursor) {

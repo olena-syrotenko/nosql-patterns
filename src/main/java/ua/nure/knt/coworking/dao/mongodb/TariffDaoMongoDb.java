@@ -101,6 +101,15 @@ public class TariffDaoMongoDb implements TariffDao {
 		return Math.toIntExact(deleteResult.getDeletedCount());
 	}
 
+	@Override
+	public Integer migrate(List<Tariff> tariffs) throws SQLException {
+		database.getCollection(TARIFF_COLLECTION)
+				.insertMany(tariffs.stream()
+						.map(this::extractDocumentFromTariff)
+						.collect(Collectors.toList()));
+		return tariffs.size();
+	}
+
 	private List<Tariff> extractTariffListFromDocuments(MongoCursor<Document> documentsCursor) {
 		ArrayList<Tariff> tariffs = new ArrayList<>();
 		while (documentsCursor.hasNext()) {

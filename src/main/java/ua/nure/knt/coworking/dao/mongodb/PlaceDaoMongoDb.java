@@ -65,6 +65,14 @@ public class PlaceDaoMongoDb implements PlaceDao {
 	}
 
 	@Override
+	public List<Place> readAllPlaces() throws SQLException {
+		MongoCursor<Document> documentsCursor = database.getCollection(PLACE_COLLECTION)
+				.find()
+				.cursor();
+		return extractPlaceListFromDocuments(documentsCursor);
+	}
+
+	@Override
 	public Place readPlaceById(Integer id) throws SQLException {
 		Document document = database.getCollection(PLACE_COLLECTION)
 				.find(eq("number", id))
@@ -91,6 +99,15 @@ public class PlaceDaoMongoDb implements PlaceDao {
 		DeleteResult deleteResult = database.getCollection(PLACE_COLLECTION)
 				.deleteMany(eq("number", id));
 		return Math.toIntExact(deleteResult.getDeletedCount());
+	}
+
+	@Override
+	public Integer migrate(List<Place> places) throws SQLException {
+		database.getCollection(PLACE_COLLECTION)
+				.insertMany(places.stream()
+						.map(this::extractDocumentFromPlace)
+						.collect(Collectors.toList()));
+		return places.size();
 	}
 
 	private List<Place> extractPlaceListFromDocuments(MongoCursor<Document> documentsCursor) {
