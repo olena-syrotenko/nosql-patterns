@@ -148,6 +148,7 @@ public class RentDaoMongoDb implements RentDao {
 								.toInstant()
 								.atZone(ZoneId.systemDefault())
 								.toLocalDate())
+						.setRentAmount(document.getDouble("rent_amount"))
 						.setTariff(new TariffBuilder().setName(rentPlaceDocument.getString("tariff"))
 								.build())
 						.build()));
@@ -180,6 +181,7 @@ public class RentDaoMongoDb implements RentDao {
 										.atStartOfDay()))
 								.append("rent_end", convertToDate(rentPlace.getRentEnd()
 										.atStartOfDay()))
+								.append("rent_amount", rentPlace.getRentAmount())
 								.append("tariff", rentPlace.getTariff()
 										.getName()))
 						.collect(Collectors.toList()));
