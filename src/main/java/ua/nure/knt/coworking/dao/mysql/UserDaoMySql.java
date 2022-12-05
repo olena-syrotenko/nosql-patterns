@@ -22,7 +22,7 @@ public class UserDaoMySql implements UserDao {
 	// READ
 	private static final String GET_USER_BY_EMAIL = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE email = ?";
 	private static final String GET_USER_BY_ID = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE user.id = ?";
-	private static final String GET_ALL_USERS = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE role.name = 'ROLE_USER'";
+	private static final String GET_ALL_USERS = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id";
 	private static final String GET_ALL_USERS_BY_FULL_NAME = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE last_name = ? AND first_name = ?";
 
 	// CREATE
@@ -184,23 +184,6 @@ public class UserDaoMySql implements UserDao {
 			statement.executeUpdate(DELETE_ALL_USERS);
 		} catch (SQLException ignored) {
 
-		} finally {
-			connection.close();
-		}
-	}
-
-	@Override
-	public Integer migrate(List<User> users) throws SQLException {
-		try {
-			for (User user : users) {
-				Integer idRole = readOrInsertRole(user.getRole());
-				user.getRole()
-						.setId(idRole);
-				createUser(user);
-			}
-			return users.size();
-		} catch (SQLException exception) {
-			return null;
 		} finally {
 			connection.close();
 		}

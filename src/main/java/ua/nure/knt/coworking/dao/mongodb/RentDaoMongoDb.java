@@ -100,15 +100,6 @@ public class RentDaoMongoDb implements RentDao {
 		return Math.toIntExact(updateResult.getModifiedCount());
 	}
 
-	@Override
-	public Integer migrate(List<RentApplication> rentApplications) throws SQLException {
-		database.getCollection(RENT_COLLECTION)
-				.insertMany(rentApplications.stream()
-						.map(this::extractDocumentFromRentApplication)
-						.collect(Collectors.toList()));
-		return rentApplications.size();
-	}
-
 	private List<RentApplication> extractRentApplicationListFromDocuments(MongoCursor<Document> documentsCursor) {
 		ArrayList<RentApplication> rentApplications = new ArrayList<>();
 		while (documentsCursor.hasNext()) {

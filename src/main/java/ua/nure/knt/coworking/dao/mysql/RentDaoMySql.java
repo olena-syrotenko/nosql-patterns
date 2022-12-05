@@ -145,6 +145,7 @@ public class RentDaoMySql implements RentDao {
 	public Integer createRentApplication(RentApplication rentApplication) throws SQLException {
 		connection.setAutoCommit(false);
 		try {
+			readOrInsertStatus(rentApplication.getStatus());
 			PreparedStatement ps = connection.prepareStatement(INSERT_RENT_APPLICATION, Statement.RETURN_GENERATED_KEYS);
 			if (rentApplication.getId() == null) {
 				ps.setNull(1, Types.NULL);
@@ -197,21 +198,6 @@ public class RentDaoMySql implements RentDao {
 			int updatedRows = ps.executeUpdate();
 			ps.close();
 			return updatedRows;
-		} catch (SQLException exception) {
-			return null;
-		} finally {
-			connection.close();
-		}
-	}
-
-	@Override
-	public Integer migrate(List<RentApplication> rentApplications) throws SQLException {
-		try {
-			for (RentApplication rentApplication : rentApplications) {
-				readOrInsertStatus(rentApplication.getStatus());
-				createRentApplication(rentApplication);
-			}
-			return rentApplications.size();
 		} catch (SQLException exception) {
 			return null;
 		} finally {

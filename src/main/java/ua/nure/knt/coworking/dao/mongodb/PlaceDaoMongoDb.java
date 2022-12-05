@@ -101,15 +101,6 @@ public class PlaceDaoMongoDb implements PlaceDao {
 		return Math.toIntExact(deleteResult.getDeletedCount());
 	}
 
-	@Override
-	public Integer migrate(List<Place> places) throws SQLException {
-		database.getCollection(PLACE_COLLECTION)
-				.insertMany(places.stream()
-						.map(this::extractDocumentFromPlace)
-						.collect(Collectors.toList()));
-		return places.size();
-	}
-
 	private List<Place> extractPlaceListFromDocuments(MongoCursor<Document> documentsCursor) {
 		ArrayList<Place> places = new ArrayList<>();
 		while (documentsCursor.hasNext()) {

@@ -1,5 +1,6 @@
 package ua.nure.knt.coworking.dao;
 
+import org.bson.Document;
 import ua.nure.knt.coworking.entity.User;
 
 import java.sql.SQLException;
@@ -19,8 +20,6 @@ public interface UserDao {
 	Integer updateUser(User user) throws SQLException;
 
 	void deleteUsers() throws SQLException;
-
-	Integer migrate(List<User> users) throws SQLException;
 }
 
 

@@ -14,5 +14,4 @@ public interface PlaceDao {
 	Integer createPlace(Place place) throws SQLException;
 	Integer updatePlace(Place place) throws SQLException;
 	Integer deletePlaceById(Integer id) throws SQLException;
-	Integer migrate(List<Place> places) throws SQLException;
 }

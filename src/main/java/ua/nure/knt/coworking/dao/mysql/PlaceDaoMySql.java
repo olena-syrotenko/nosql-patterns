@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class PlaceDaoMySql implements PlaceDao {
 	private final Connection connection;
@@ -45,7 +46,7 @@ public class PlaceDaoMySql implements PlaceDao {
 	private static final String GET_ROOM_TYPE_BY_NAME = "SELECT id, name FROM room_type WHERE name = ?";
 	private static final String INSERT_ROOM_TYPE = "INSERT INTO room_type(name) VALUES(?)";
 	private static final String GET_ROOM_BY_NAME = "SELECT id, name FROM room WHERE name = ?";
-	private static final String INSERT_ROOM = "INSERT INTO room(id, name, id_room_type) VALUES(?,?,(SELECT id FROM room_type WHERE room_type.name = ?)) ON DUPLICATE KEY UPDATE name = VALUES(name), id_room_type = VALUES(id_room_type)";
+	private static final String INSERT_ROOM = "INSERT INTO room VALUES(?,?,?,?,(SELECT id FROM room_type WHERE room_type.name = ?)) ON DUPLICATE KEY UPDATE name = VALUES(name), id_room_type = VALUES(id_room_type)";
 
 	public PlaceDaoMySql(Connection connection) {
 		this.connection = connection;
@@ -130,6 +131,9 @@ public class PlaceDaoMySql implements PlaceDao {
 	@Override
 	public Integer createPlace(Place place) throws SQLException {
 		try {
+			readOrInsertRoomType(place.getRoom()
+					.getRoomType());
+			readOrInsertRoom(place.getRoom());
 			PreparedStatement ps = connection.prepareStatement(INSERT_PLACE, Statement.RETURN_GENERATED_KEYS);
 			if (place.getId() == null) {
 				ps.setNull(1, Types.NULL);
@@ -188,26 +192,6 @@ public class PlaceDaoMySql implements PlaceDao {
 		}
 	}
 
-	@Override
-	public Integer migrate(List<Place> places) throws SQLException {
-		try {
-			for (Place place : places) {
-				Integer roomTypeId = readOrInsertRoomType(place.getRoom()
-						.getRoomType());
-				place.getRoom()
-						.getRoomType()
-						.setId(roomTypeId);
-				readOrInsertRoom(place.getRoom());
-				createPlace(place);
-			}
-			return places.size();
-		} catch (SQLException exception) {
-			return null;
-		} finally {
-			connection.close();
-		}
-	}
-
 	private Integer readOrInsertRoomType(RoomType roomType) throws SQLException {
 		PreparedStatement readPs = connection.prepareStatement(GET_ROOM_TYPE_BY_NAME);
 		readPs.setString(1, roomType.getName());
@@ -241,9 +225,17 @@ public class PlaceDaoMySql implements PlaceDao {
 		}
 		if (!Objects.equals(roomId, room.getId())) {
 			PreparedStatement insertPs = connection.prepareStatement(INSERT_ROOM);
-			insertPs.setInt(1, room.getId());
+			if (room.getId() == null) {
+				insertPs.setNull(1, Types.NULL);
+			} else {
+				insertPs.setInt(1, room.getId());
+			}
 			insertPs.setString(2, room.getName());
-			insertPs.setString(3, room.getRoomType()
+			insertPs.setDouble(3, Optional.ofNullable(room.getArea())
+					.orElse(0.0));
+			insertPs.setInt(4, Optional.ofNullable(room.getMaxPlaces())
+					.orElse(1));
+			insertPs.setString(5, room.getRoomType()
 					.getName());
 			insertPs.executeUpdate();
 			insertPs.close();

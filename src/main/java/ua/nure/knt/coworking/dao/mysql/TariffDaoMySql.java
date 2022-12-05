@@ -223,25 +223,6 @@ public class TariffDaoMySql implements TariffDao {
 		}
 	}
 
-	@Override
-	public Integer migrate(List<Tariff> tariffs) throws SQLException {
-		try {
-			for (Tariff tariff : tariffs) {
-				readOrInsertRoomType(tariff.getRoomType());
-				readOrInsertTimeUnit(tariff.getTimeUnit());
-				for (Service service : tariff.getServices()) {
-					readOrInsertService(service);
-				}
-				createTariff(tariff);
-			}
-			return tariffs.size();
-		} catch (SQLException exception) {
-			return null;
-		} finally {
-			connection.close();
-		}
-	}
-
 	private Integer readOrInsertRoomType(RoomType roomType) throws SQLException {
 		return readOrInsertCategory(GET_ROOM_TYPE_BY_NAME, INSERT_ROOM_TYPE, roomType.getName());
 	}

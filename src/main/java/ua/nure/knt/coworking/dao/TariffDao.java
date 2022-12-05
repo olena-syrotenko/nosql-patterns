@@ -19,6 +19,4 @@ public interface TariffDao {
 	Integer updateTariff(Tariff tariff) throws SQLException;
 
 	Integer deleteTariffById(Integer id) throws SQLException;
-
-	Integer migrate(List<Tariff> tariffs) throws SQLException;
 }

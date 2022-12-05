@@ -15,7 +15,6 @@ import ua.nure.knt.coworking.util.UserBuilder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -87,15 +86,6 @@ public class UserDaoMongoDb implements UserDao {
 	public void deleteUsers() throws SQLException {
 		database.getCollection(USER_COLLECTION)
 				.deleteMany(gte("id", 0));
-	}
-
-	@Override
-	public Integer migrate(List<User> users) throws SQLException {
-		database.getCollection(USER_COLLECTION)
-				.insertMany(users.stream()
-						.map(this::extractDocumentFromUser)
-						.collect(Collectors.toList()));
-		return users.size();
 	}
 
 	private List<User> extractUserListFromDocuments(MongoCursor<Document> documentsCursor) {

@@ -20,6 +20,4 @@ public interface RentDao {
 	Integer createRentApplication(RentApplication rentApplication) throws SQLException;
 
 	Integer updateRentApplicationStatus(RentApplication rentApplication) throws SQLException;
-
-	Integer migrate(List<RentApplication> rentApplications) throws SQLException;
 }
