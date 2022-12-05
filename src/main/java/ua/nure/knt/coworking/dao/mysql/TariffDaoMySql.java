@@ -128,6 +128,11 @@ public class TariffDaoMySql implements TariffDao {
 	public Integer createTariff(Tariff tariff) throws SQLException {
 		connection.setAutoCommit(false);
 		try {
+			readOrInsertRoomType(tariff.getRoomType());
+			readOrInsertTimeUnit(tariff.getTimeUnit());
+			for (Service service : tariff.getServices()) {
+				readOrInsertService(service);
+			}
 			PreparedStatement ps = connection.prepareStatement(INSERT_TARIFF, Statement.RETURN_GENERATED_KEYS);
 			if (tariff.getId() == null) {
 				ps.setNull(1, Types.NULL);
@@ -143,7 +148,10 @@ public class TariffDaoMySql implements TariffDao {
 			ps.executeUpdate();
 			ResultSet keys = ps.getGeneratedKeys();
 			int insertTariffId = 0;
-			if (keys.next()) {
+			if(tariff.getId() != null){
+				insertTariffId = tariff.getId();
+			}
+			else if (keys.next()) {
 				insertTariffId = keys.getInt(1);
 			}
 

@@ -46,7 +46,7 @@ public class PlaceDaoMySql implements PlaceDao {
 	private static final String GET_ROOM_TYPE_BY_NAME = "SELECT id, name FROM room_type WHERE name = ?";
 	private static final String INSERT_ROOM_TYPE = "INSERT INTO room_type(name) VALUES(?)";
 	private static final String GET_ROOM_BY_NAME = "SELECT id, name FROM room WHERE name = ?";
-	private static final String INSERT_ROOM = "INSERT INTO room VALUES(?,?,?,?,(SELECT id FROM room_type WHERE room_type.name = ?)) ON DUPLICATE KEY UPDATE name = VALUES(name), id_room_type = VALUES(id_room_type)";
+	private static final String INSERT_ROOM = "INSERT INTO room VALUES(?,?,?,?,(SELECT id FROM room_type WHERE room_type.name = ?))";
 
 	public PlaceDaoMySql(Connection connection) {
 		this.connection = connection;

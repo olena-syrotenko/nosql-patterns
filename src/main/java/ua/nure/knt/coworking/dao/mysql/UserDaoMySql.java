@@ -1,6 +1,5 @@
 package ua.nure.knt.coworking.dao.mysql;
 
-import ua.nure.knt.coworking.constants.RoleEnum;
 import ua.nure.knt.coworking.dao.UserDao;
 import ua.nure.knt.coworking.entity.Role;
 import ua.nure.knt.coworking.entity.User;
@@ -126,6 +125,7 @@ public class UserDaoMySql implements UserDao {
 	@Override
 	public Integer createUser(User user) throws SQLException {
 		try {
+			readOrInsertRole(user.getRole());
 			PreparedStatement ps = connection.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS);
 			if (user.getId() == null) {
 				ps.setNull(1, Types.NULL);
@@ -138,7 +138,8 @@ public class UserDaoMySql implements UserDao {
 			ps.setString(5, user.getFirstName());
 			ps.setString(6, user.getPassportId());
 			ps.setString(7, user.getPhoneNumber());
-			ps.setString(8, RoleEnum.ROLE_USER.name());
+			ps.setString(8, user.getRole()
+					.getName());
 			ps.executeUpdate();
 
 			ResultSet keys = ps.getGeneratedKeys();

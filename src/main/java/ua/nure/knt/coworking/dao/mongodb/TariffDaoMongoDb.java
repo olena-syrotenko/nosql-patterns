@@ -75,16 +75,18 @@ public class TariffDaoMongoDb implements TariffDao {
 
 	@Override
 	public Integer createTariff(Tariff tariff) throws SQLException {
-		Document lastId = database.getCollection(TARIFF_COLLECTION)
-				.find()
-				.sort(descending("id"))
-				.limit(1)
-				.first();
-		Integer newId = lastId == null ? 1 : lastId.getInteger("id") + 1;
-		tariff.setId(newId);
+		if(tariff.getId() == null) {
+			Document lastId = database.getCollection(TARIFF_COLLECTION)
+					.find()
+					.sort(descending("id"))
+					.limit(1)
+					.first();
+			Integer newId = lastId == null ? 1 : lastId.getInteger("id") + 1;
+			tariff.setId(newId);
+		}
 		database.getCollection(TARIFF_COLLECTION)
 				.insertOne(extractDocumentFromTariff(tariff));
-		return newId;
+		return tariff.getId();
 	}
 
 	@Override

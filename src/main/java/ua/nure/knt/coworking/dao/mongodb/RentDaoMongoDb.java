@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.and;
@@ -79,16 +80,18 @@ public class RentDaoMongoDb implements RentDao {
 
 	@Override
 	public Integer createRentApplication(RentApplication rentApplication) throws SQLException {
-		Document lastId = database.getCollection(RENT_COLLECTION)
-				.find()
-				.sort(descending("id"))
-				.limit(1)
-				.first();
-		Integer newId = lastId == null ? 1 : lastId.getInteger("number") + 1;
-		rentApplication.setId(newId);
+		if(rentApplication.getId() == null) {
+			Document lastId = database.getCollection(RENT_COLLECTION)
+					.find()
+					.sort(descending("id"))
+					.limit(1)
+					.first();
+			Integer newId = lastId == null ? 1 : lastId.getInteger("number") + 1;
+			rentApplication.setId(newId);
+		}
 		database.getCollection(RENT_COLLECTION)
 				.insertOne(extractDocumentFromRentApplication(rentApplication));
-		return newId;
+		return rentApplication.getId();
 	}
 
 	@Override
@@ -148,8 +151,8 @@ public class RentDaoMongoDb implements RentDao {
 
 	private Document extractDocumentFromRentApplication(RentApplication rentApplication) {
 		return new Document().append("number", rentApplication.getId())
-				.append("create_date", convertToDate(LocalDateTime.now()))
-				.append("last_change", convertToDate(LocalDateTime.now()))
+				.append("create_date", convertToDate(Optional.ofNullable(rentApplication.getCreateDate()).orElse(LocalDateTime.now())))
+				.append("last_change", convertToDate(Optional.ofNullable(rentApplication.getLastChange()).orElse(LocalDateTime.now())))
 				.append("lease_agreement", rentApplication.getLeaseAgreement())
 				.append("status", rentApplication.getStatus()
 						.getName())

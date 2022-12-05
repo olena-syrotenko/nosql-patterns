@@ -31,11 +31,11 @@ public class RentDaoMySql implements RentDao {
 	private final Connection connection;
 
 	// READ
-	private static final String GET_RENT_APPLICATION_BY_STATUS = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE status.name = ?";
-	private static final String GET_RENT_APPLICATION_BY_USER = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE user.email = ?";
-	private static final String GET_RENT_APPLICATION_BY_USER_AND_STATUS = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE user.email = ? AND status.name = ?";
-	private static final String GET_RENT_APPLICATION_BY_ID = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE rent_application.id = ?";
-	private static final String GET_ALL_RENT_APPLICATION = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id";
+	private static final String GET_RENT_APPLICATION_BY_STATUS = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, user.passport_id, user.last_name, user.first_name, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE status.name = ?";
+	private static final String GET_RENT_APPLICATION_BY_USER = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, user.passport_id, user.last_name, user.first_name, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE user.email = ?";
+	private static final String GET_RENT_APPLICATION_BY_USER_AND_STATUS = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, user.passport_id, user.last_name, user.first_name, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE user.email = ? AND status.name = ?";
+	private static final String GET_RENT_APPLICATION_BY_ID = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, user.passport_id, user.last_name, user.first_name, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE rent_application.id = ?";
+	private static final String GET_ALL_RENT_APPLICATION = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, user.passport_id, user.last_name, user.first_name, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id";
 	private static final String GET_RENT_PLACE_BY_RENT_APPLICATION_ID = "SELECT place_id, room.id, room.name, rent_start, rent_end, rent_amount, tariff.name, tariff.price, duration FROM rent_place JOIN place ON place_id = place.id JOIN room ON id_room = room.id JOIN tariff ON tariff_id = tariff.id JOIN time_unit ON id_time_unit = time_unit.id WHERE rent_application_id = ?";
 
 	// CREATE
@@ -157,7 +157,7 @@ public class RentDaoMySql implements RentDao {
 			ps.setTimestamp(3, Timestamp.valueOf(Optional.ofNullable(rentApplication.getLastChange())
 					.orElse(LocalDateTime.now())));
 			ps.setString(4, StringUtils.defaultString(rentApplication.getLeaseAgreement(), " "));
-			ps.setString(5, StatusEnum.NEW.getStatus());
+			ps.setString(5, rentApplication.getStatus().getName());
 			ps.setString(6, rentApplication.getUser()
 					.getEmail());
 			if (rentApplication.getRentAmount() == null) {
@@ -168,7 +168,10 @@ public class RentDaoMySql implements RentDao {
 			ps.executeUpdate();
 			ResultSet keys = ps.getGeneratedKeys();
 			int insertRentApplicationId = 0;
-			if (keys.next()) {
+			if(rentApplication.getId() != null) {
+				insertRentApplicationId = rentApplication.getId();
+			}
+			else if (keys.next()) {
 				insertRentApplicationId = keys.getInt(1);
 			}
 
@@ -295,8 +298,11 @@ public class RentDaoMySql implements RentDao {
 				.setStatus(new StatusBuilder().setName(rs.getString(5))
 						.build())
 				.setUser(new UserBuilder().setEmail(rs.getString(6))
+						.setPassportId(rs.getString(7))
+						.setLastName(rs.getString(8))
+						.setFirstName(rs.getString(9))
 						.build())
-				.setRentAmount(rs.getDouble(7));
+				.setRentAmount(rs.getDouble(10));
 		rentPlaces.forEach(rentApplicationBuilder::setRentPlace);
 		return rentApplicationBuilder.build();
 	}
