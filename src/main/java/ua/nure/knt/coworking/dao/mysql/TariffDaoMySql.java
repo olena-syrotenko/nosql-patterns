@@ -1,6 +1,7 @@
 package ua.nure.knt.coworking.dao.mysql;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.bson.Document;
 import ua.nure.knt.coworking.dao.TariffDao;
 import ua.nure.knt.coworking.entity.RoomType;
 import ua.nure.knt.coworking.entity.Service;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -102,6 +104,31 @@ public class TariffDaoMySql implements TariffDao {
 		} finally {
 			connection.close();
 		}
+	}
+
+	@Override
+	public List<Document> readRoomTypeCountByPriceRange(Double maxPrice) {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<Document> readRoomTypeSumByTimeUnit(String roomType) {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<Document> readServiceCountByRange(Integer minServiceUsage) {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public Document readTimeUnitWithMaxAvgPrice() {
+		return new Document();
+	}
+
+	@Override
+	public List<Document> readMaxPriceByRoomTypeTimeUnitByServiceNumber(Integer serviceNumber) {
+		return Collections.emptyList();
 	}
 
 	@Override

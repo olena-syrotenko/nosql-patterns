@@ -18,12 +18,30 @@ import ua.nure.knt.coworking.util.TimeUnitBuilder;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.mongodb.client.model.Accumulators.avg;
+import static com.mongodb.client.model.Accumulators.max;
+import static com.mongodb.client.model.Accumulators.sum;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.limit;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.project;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Aggregates.unwind;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gte;
+import static com.mongodb.client.model.Filters.lt;
 import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.size;
+import static com.mongodb.client.model.Projections.computed;
+import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.Sorts.descending;
 
 public class TariffDaoMongoDb implements TariffDao {
@@ -56,6 +74,63 @@ public class TariffDaoMongoDb implements TariffDao {
 				.find(eq("time_unit", timeUnit))
 				.cursor();
 		return extractTariffListFromDocuments(tariffsCursor);
+	}
+
+	@Override
+	public List<Document> readRoomTypeCountByPriceRange(Double maxPrice) {
+		Bson match = match(lt("price", maxPrice));
+		Bson group = group("$room_type", sum("tariffCount", 1));
+		Bson project = project(fields(excludeId(), computed("room_type", "$_id"), include("tariffCount")));
+		return database.getCollection(TARIFF_COLLECTION)
+				.aggregate(Arrays.asList(match, group, project))
+				.into(new ArrayList<>());
+	}
+
+	@Override
+	public List<Document> readRoomTypeSumByTimeUnit(String roomType) {
+		Bson match = match(eq("room_type", roomType));
+		Bson group = group("$time_unit", sum("tariffSum", "$price"));
+		Bson project = project(fields(excludeId(), computed("time_unit", "$_id"), include("tariffSum")));
+		return database.getCollection(TARIFF_COLLECTION)
+				.aggregate(Arrays.asList(match, group, project))
+				.into(new ArrayList<>());
+	}
+
+	@Override
+	public List<Document> readServiceCountByRange(Integer minServiceUsage) {
+		Bson unwind = unwind("services");
+		Bson group = group("$services", sum("serviceCount", 1));
+		Bson match = match(gte("serviceCount", minServiceUsage));
+		Bson project = project(fields(excludeId(), computed("service", "$_id"), include("serviceCount")));
+		return database.getCollection(TARIFF_COLLECTION)
+				.aggregate(Arrays.asList(unwind, group, match, project))
+				.into(new ArrayList<>());
+	}
+
+	@Override
+	public Document readTimeUnitWithMaxAvgPrice() {
+		Bson group = group("$time_unit", avg("timeUnitAvg", "$price"));
+		Bson project = project(fields(excludeId(), computed("time_unit", "$_id"), include("timeUnitAvg")));
+		Bson sort = sort(descending("timeUnitAvg"));
+		Bson limit = limit(1);
+		return database.getCollection(TARIFF_COLLECTION)
+				.aggregate(Arrays.asList(group, project, sort, limit))
+				.first();
+	}
+
+	@Override
+	public List<Document> readMaxPriceByRoomTypeTimeUnitByServiceNumber(Integer serviceNumber) {
+		Bson match = match(size("services", serviceNumber));
+		Document groupFields = new Document(new HashMap<String, Object>() {{
+			put("room_type", "$room_type");
+			put("time_unit", "$time_unit");
+		}});
+		Bson group = group(groupFields, max("tariffMaxPrice", "$price"));
+		Bson project = project(
+				fields(excludeId(), computed("room_type", "$_id.room_type"), computed("time_unit", "$_id.time_unit"), include("tariffMaxPrice")));
+		return database.getCollection(TARIFF_COLLECTION)
+				.aggregate(Arrays.asList(match, group, project))
+				.into(new ArrayList<>());
 	}
 
 	public List<Tariff> readTariffByTimeUnitLowerPrice(String timeUnit, Double maxPrice) {
