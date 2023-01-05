@@ -1,6 +1,7 @@
 package ua.nure.knt.coworking.dao.mysql;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bson.Document;
 import ua.nure.knt.coworking.dao.TariffDao;
 import ua.nure.knt.coworking.entity.RoomType;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class TariffDaoMySql implements TariffDao {
 	private final Connection connection;
@@ -112,8 +114,18 @@ public class TariffDaoMySql implements TariffDao {
 	}
 
 	@Override
+	public Map<String, Long> readRoomTypeCountByPriceRangeWithoutAggregation(Double maxPrice) {
+		return null;
+	}
+
+	@Override
 	public List<Document> readRoomTypeSumByTimeUnit(String roomType) {
 		return Collections.emptyList();
+	}
+
+	@Override
+	public Map<String, Double> readRoomTypeSumByTimeUnitWithoutAggregation(String roomType) {
+		return null;
 	}
 
 	@Override
@@ -122,13 +134,28 @@ public class TariffDaoMySql implements TariffDao {
 	}
 
 	@Override
+	public Map<String, Long> readServiceCountByRangeWithoutAggregation(Integer minServiceUsage) {
+		return null;
+	}
+
+	@Override
 	public Document readTimeUnitWithMaxAvgPrice() {
 		return new Document();
 	}
 
 	@Override
+	public Map.Entry<String, Double> readTimeUnitWithMaxAvgPriceWithoutAggregation() {
+		return null;
+	}
+
+	@Override
 	public List<Document> readMaxPriceByRoomTypeTimeUnitByServiceNumber(Integer serviceNumber) {
 		return Collections.emptyList();
+	}
+
+	@Override
+	public Map<Pair<String, String>, Double> readMaxPriceByRoomTypeTimeUnitByServiceNumberWithoutAggregation(Integer serviceNumber) {
+		return null;
 	}
 
 	@Override

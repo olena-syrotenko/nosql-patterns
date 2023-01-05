@@ -6,6 +6,8 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import ua.nure.knt.coworking.dao.TariffDao;
@@ -19,8 +21,12 @@ import ua.nure.knt.coworking.util.TimeUnitBuilder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Accumulators.avg;
@@ -87,6 +93,16 @@ public class TariffDaoMongoDb implements TariffDao {
 	}
 
 	@Override
+	public Map<String, Long> readRoomTypeCountByPriceRangeWithoutAggregation(Double maxPrice) {
+		return database.getCollection(TARIFF_COLLECTION)
+				.find(lt("price", maxPrice))
+				.projection(fields(excludeId(), include("room_type")))
+				.into(new ArrayList<>())
+				.stream()
+				.collect(Collectors.groupingBy(document -> document.getString("room_type"), Collectors.counting()));
+	}
+
+	@Override
 	public List<Document> readRoomTypeSumByTimeUnit(String roomType) {
 		Bson match = match(eq("room_type", roomType));
 		Bson group = group("$time_unit", sum("tariffSum", "$price"));
@@ -97,14 +113,40 @@ public class TariffDaoMongoDb implements TariffDao {
 	}
 
 	@Override
+	public Map<String, Double> readRoomTypeSumByTimeUnitWithoutAggregation(String roomType) {
+		return database.getCollection(TARIFF_COLLECTION)
+				.find(eq("room_type", roomType))
+				.projection(fields(excludeId(), include("time_unit"), include("price")))
+				.into(new ArrayList<>())
+				.stream()
+				.collect(Collectors.groupingBy(document -> document.getString("time_unit"), Collectors.summingDouble(document -> document.getDouble("price"))));
+	}
+
+	@Override
 	public List<Document> readServiceCountByRange(Integer minServiceUsage) {
-		Bson unwind = unwind("services");
+		Bson unwind = unwind("$services");
 		Bson group = group("$services", sum("serviceCount", 1));
 		Bson match = match(gte("serviceCount", minServiceUsage));
 		Bson project = project(fields(excludeId(), computed("service", "$_id"), include("serviceCount")));
 		return database.getCollection(TARIFF_COLLECTION)
 				.aggregate(Arrays.asList(unwind, group, match, project))
 				.into(new ArrayList<>());
+	}
+
+	@Override
+	public Map<String, Long> readServiceCountByRangeWithoutAggregation(Integer minServiceUsage) {
+		return database.getCollection(TARIFF_COLLECTION)
+				.find()
+				.projection(fields(excludeId(), include("services")))
+				.into(new ArrayList<>())
+				.stream()
+				.map(document -> document.getList("services", String.class))
+				.flatMap(Collection::stream)
+				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+				.entrySet()
+				.stream()
+				.filter(e -> e.getValue() >= minServiceUsage)
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	@Override
@@ -116,6 +158,21 @@ public class TariffDaoMongoDb implements TariffDao {
 		return database.getCollection(TARIFF_COLLECTION)
 				.aggregate(Arrays.asList(group, project, sort, limit))
 				.first();
+	}
+
+	@Override
+	public Map.Entry<String, Double> readTimeUnitWithMaxAvgPriceWithoutAggregation() {
+		return database.getCollection(TARIFF_COLLECTION)
+				.find()
+				.projection(fields(excludeId(), include("time_unit"), include("price")))
+				.into(new ArrayList<>())
+				.stream()
+				.collect(
+						Collectors.groupingBy(document -> document.getString("time_unit"), Collectors.averagingDouble(document -> document.getDouble("price"))))
+				.entrySet()
+				.stream()
+				.max(Map.Entry.comparingByValue())
+				.orElse(null);
 	}
 
 	@Override
@@ -131,6 +188,19 @@ public class TariffDaoMongoDb implements TariffDao {
 		return database.getCollection(TARIFF_COLLECTION)
 				.aggregate(Arrays.asList(match, group, project))
 				.into(new ArrayList<>());
+	}
+
+	@Override
+	public Map<Pair<String, String>, Double> readMaxPriceByRoomTypeTimeUnitByServiceNumberWithoutAggregation(Integer serviceNumber) {
+		return database.getCollection(TARIFF_COLLECTION)
+				.find(size("services", serviceNumber))
+				.projection(fields(excludeId(), include("time_unit"), include("room_type"), include("price")))
+				.into(new ArrayList<>())
+				.stream()
+				.collect(Collectors.groupingBy(document -> new ImmutablePair<>(document.getString("room_type"), document.getString("time_unit")),
+						Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparing(document -> document.getDouble("price"))),
+								document -> document.orElse(new Document())
+										.getDouble("price"))));
 	}
 
 	public List<Tariff> readTariffByTimeUnitLowerPrice(String timeUnit, Double maxPrice) {
