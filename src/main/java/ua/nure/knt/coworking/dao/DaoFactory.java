@@ -1,10 +1,12 @@
 package ua.nure.knt.coworking.dao;
 
+import org.springframework.stereotype.Component;
 import ua.nure.knt.coworking.dao.mongodb.DaoFactoryMongoDb;
 import ua.nure.knt.coworking.dao.mysql.DaoFactoryMySql;
 
 import java.sql.SQLException;
 
+@Component
 public abstract class DaoFactory {
 	private static DaoFactory daoFactory = null;
 

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Registration</title>
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css}" rel="stylesheet"
+		  integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+	<style>
+		.block{
+			width: 80%;
+			margin: auto;
+		}
+		.form-control{
+			width: 20%;
+		}
+	</style>
+</head>
+<body>
+<th:block th:include="/navBar"></th:block>
+<form th:action="@{/registration}" th:object="${userForm}" class="block" method="post">
+	<div class="form-group">
+		<label for="exampleInputEmail1">Email address</label>
+		<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" th:field="*{email}" required>
+		<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+	</div>
+	<div class="form-group">
+		<label for="exampleInputPassword1">Password</label>
+		<input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" th:field="*{password}" required>
+	</div>
+	<div class="form-group">
+		<label for="inputLastName">Last Name</label>
+		<input type="text" class="form-control" id="inputLastName" placeholder="Last name" th:field="*{lastName}" required>
+	</div>
+	<div class="form-group">
+		<label for="inputFirstName">First Name</label>
+		<input type="text" class="form-control" id="inputFirstName" placeholder="First name" th:field="*{firstName}" required>
+	</div>
+	<div class="form-group">
+		<label for="inputPassportId">Passport Number</label>
+		<input type="text" class="form-control" id="inputPassportId" placeholder="Passport number" th:field="*{passportId}" required>
+	</div>
+	<div class="form-group">
+		<label for="inputPhone">Phone Number</label>
+		<input type="text" class="form-control" id="inputPhone" placeholder="Phone number" th:field="*{phoneNumber}" required>
+	</div>
+	<button type="submit" class="btn btn-primary">Sign Up</button>
+</form>
+</body>
+</html>
