@@ -48,7 +48,7 @@ public class PlaceDaoMongoDb implements PlaceDao {
 	}
 
 	@Override
-	public List<Place> readAvailablePlace(LocalDate dateFrom, LocalDate dateTo, Integer idRoomType) throws SQLException {
+	public List<Place> readAvailablePlace(LocalDate dateFrom, LocalDate dateTo, String roomType) throws SQLException {
 		List<Place> places = extractPlaceListFromDocuments(database.getCollection(PLACE_COLLECTION)
 				.find()
 				.cursor());

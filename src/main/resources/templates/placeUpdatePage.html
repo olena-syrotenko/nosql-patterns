@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Update place</title>
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css}" rel="stylesheet">
+	<style>
+		.block {
+			width: 80%;
+			margin: auto;
+		}
+
+		.form-control {
+			width: 20%;
+		}
+	</style>
+</head>
+<body>
+<th:block th:include="/navBar"></th:block>
+
+<h2>New place information</h2>
+
+
+<form class="block" th:object="${placeForm}" method="POST">
+
+	<div class="form-group">
+		<label for="area">Area</label>
+		<input type="number" class="form-control" placeholder="Enter area" th:field="*{area}"/>
+	</div>
+	<td><input type="submit" class="btn btn-warning" value="Update"/></td>
+
+</form>
+</body>
+</html>

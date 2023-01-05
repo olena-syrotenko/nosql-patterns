@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Places</title>
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+<th:block th:include="/navBar"></th:block>
+<div class="container">
+	<div>
+		<h2>Places</h2>
+		<form class = "form-inline my-2 my-lg-0 d-inline-flex" th:action="@{/places}" method="get">
+			<div class="form-group" >
+				<input type="text"	class="form-control" style="width: 350px" name="rentInfo"  placeholder="2022-12-20 2022-12-25 open_space" th:value="${rentInfo}" />
+				<input class="btn btn-outline-dark my-2 my-sm-0" type="submit" value="Search"/>
+			</div>
+		</form>
+	</div>
+	<table class="table table-striped">
+		<tr>
+			<th>Number</th>
+			<th>Area</th>
+			<th>Room</th>
+			<th>Type</th>
+			<th></th>
+			<th></th>
+		</tr>
+		<tr th:each="place : ${places}">
+			<td th:utext="${place.id}">..</td>
+			<td th:utext="${place.area}">..</td>
+			<td th:utext="${place.room.id} + ' ' + ${place.room.name}">..</td>
+			<td th:utext="${place.room.roomType.name}">..</td>
+			<th><a th:href="'/update-place/'+${place.id}" class="btn btn-outline-dark" role="button"
+				   aria-disabled="true">Edit</a></th>
+			<th>
+				<form th:action="'/delete-place/' + ${place.id}" method="post">
+				<input class="btn btn-outline-dark"
+				    type="submit" value="Delete"/>
+				</form>
+			</th>
+		</tr>
+	</table>
+	<a th:href="'/create-place'" class="btn btn-outline-dark" role="button"
+	   aria-disabled="true">Add</a>
+</div>
+</body>
+</html>

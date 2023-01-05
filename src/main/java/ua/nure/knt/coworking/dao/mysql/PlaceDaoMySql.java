@@ -71,12 +71,20 @@ public class PlaceDaoMySql implements PlaceDao {
 	}
 
 	@Override
-	public List<Place> readAvailablePlace(LocalDate dateFrom, LocalDate dateTo, Integer idRoomType) throws SQLException {
+	public List<Place> readAvailablePlace(LocalDate dateFrom, LocalDate dateTo, String roomType) throws SQLException {
 		try {
 			CallableStatement cs = connection.prepareCall(GET_AVAILABLE_PLACE_BY_ROOM_TYPE);
 			cs.setTimestamp(1, Timestamp.valueOf(dateFrom.atStartOfDay()));
 			cs.setTimestamp(2, Timestamp.valueOf(dateTo.atStartOfDay()));
-			cs.setInt(3, idRoomType);
+
+			PreparedStatement readPs = connection.prepareStatement(GET_ROOM_TYPE_BY_NAME);
+			readPs.setString(1, roomType);
+			ResultSet readRs = readPs.executeQuery();
+			int roomTypeId = 0;
+			if (readRs.next()) {
+				roomTypeId = readRs.getInt("id");
+			}
+			cs.setInt(3, roomTypeId);
 
 			ResultSet rs = cs.executeQuery();
 			List<Place> places = extractPlaceListFromResultSet(rs);
@@ -131,9 +139,6 @@ public class PlaceDaoMySql implements PlaceDao {
 	@Override
 	public Integer createPlace(Place place) throws SQLException {
 		try {
-			readOrInsertRoomType(place.getRoom()
-					.getRoomType());
-			readOrInsertRoom(place.getRoom());
 			PreparedStatement ps = connection.prepareStatement(INSERT_PLACE, Statement.RETURN_GENERATED_KEYS);
 			if (place.getId() == null) {
 				ps.setNull(1, Types.NULL);
