@@ -1,5 +1,6 @@
 package ua.nure.knt.coworking.dao.mysql;
 
+import org.bson.Document;
 import ua.nure.knt.coworking.dao.UserDao;
 import ua.nure.knt.coworking.entity.Role;
 import ua.nure.knt.coworking.entity.User;
@@ -188,6 +189,16 @@ public class UserDaoMySql implements UserDao {
 		} finally {
 			connection.close();
 		}
+	}
+
+	@Override
+	public void createUserFromDocument(Document document) {
+
+	}
+
+	@Override
+	public List<Document> readUsersDocumentsByFullName(String lastName, String firstName) {
+		return null;
 	}
 
 	private Integer readOrInsertRole(Role role) throws SQLException {

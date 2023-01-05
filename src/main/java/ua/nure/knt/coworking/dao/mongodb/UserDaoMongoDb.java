@@ -1,5 +1,6 @@
 package ua.nure.knt.coworking.dao.mongodb;
 
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -86,6 +87,35 @@ public class UserDaoMongoDb implements UserDao {
 	public void deleteUsers() throws SQLException {
 		database.getCollection(USER_COLLECTION)
 				.deleteMany(gte("id", 0));
+	}
+
+	@Override
+	public void createUserFromDocument(Document document) throws InterruptedException {
+		int counter = 1;
+		do {
+			try {
+				database.getCollection(USER_COLLECTION)
+						.withWriteConcern(WriteConcern.UNACKNOWLEDGED)
+						.insertOne(document);
+				return;
+			} catch (Exception e) {
+				Thread.sleep(1000);
+				counter++;
+			}
+		} while (counter < 3);
+		throw new RuntimeException("Error occurred");
+	}
+
+	@Override
+	public List<Document> readUsersDocumentsByFullName(String lastName, String firstName) {
+		MongoCursor<Document> usersCursor = database.getCollection(USER_COLLECTION)
+				.find(and(eq("last_name", lastName), eq("first_name", firstName)))
+				.cursor();
+		ArrayList<Document> documents = new ArrayList<>();
+		while (usersCursor.hasNext()) {
+			documents.add(usersCursor.next());
+		}
+		return documents;
 	}
 
 	private List<User> extractUserListFromDocuments(MongoCursor<Document> documentsCursor) {

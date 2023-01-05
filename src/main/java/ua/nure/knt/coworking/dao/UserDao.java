@@ -20,6 +20,10 @@ public interface UserDao {
 	Integer updateUser(User user) throws SQLException;
 
 	void deleteUsers() throws SQLException;
+
+	void createUserFromDocument(Document document) throws InterruptedException;
+
+	List<Document> readUsersDocumentsByFullName(String lastName, String firstName);
 }
 
 
