@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Update tariff</title>
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css}" rel="stylesheet">
+	<style>
+		.block {
+			width: 80%;
+			margin: auto;
+		}
+
+		.form-control {
+			width: 20%;
+		}
+	</style>
+</head>
+<body>
+<th:block th:include="/navBar"></th:block>
+
+<h2>New tariff information</h2>
+
+
+<form class="block" th:object="${tariffForm}" method="POST">
+
+	<div class="form-group">
+		<label for="name">Name</label>
+		<input type="text" class="form-control" placeholder="Enter name" th:field="*{name}"/>
+	</div>
+	<div class="form-group">
+		<label for="price">Price</label>
+		<input type="text" class="form-control" placeholder="Enter price" th:field="*{price}"/>
+	</div>
+	<div class="form-group">
+		<label for="services">Services</label>
+		<input type="text" class="form-control" placeholder="Enter services" th:field="*{services}"/>
+	</div>
+	<input type="submit" class="btn btn-warning" value="Update"/>
+
+</form>
+</body>
+</html>

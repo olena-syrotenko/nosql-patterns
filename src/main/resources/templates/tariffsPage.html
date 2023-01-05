@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Tariffs</title>
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+<th:block th:include="/navBar"></th:block>
+<div class="container">
+	<div>
+		<h2>Tariffs</h2>
+	</div>
+	<table class="table table-striped">
+		<tr>
+			<th>Name</th>
+			<th>TimeUnit</th>
+			<th>RoomType</th>
+			<th>Price</th>
+			<th>Services</th>
+			<th></th>
+			<th></th>
+		</tr>
+		<tr th:each="tariff : ${tariffs}">
+			<td th:utext="${tariff.name}">..</td>
+			<td th:utext="${tariff.timeUnit.name}">..</td>
+			<td th:utext="${tariff.roomType.name}">..</td>
+			<td th:utext="${tariff.price}">..</td>
+			<td>
+				<ul th:each="service : ${tariff.services}">
+					<li th:text="${service.name}"></li>
+				</ul>
+			</td>
+			<th><a th:href="'/update-tariff/'+${tariff.id}" class="btn btn-outline-dark" role="button"
+				   aria-disabled="true">Edit</a></th>
+			<th>
+				<form th:action="'/delete-tariff/' + ${tariff.id}" method="post">
+					<input class="btn btn-outline-dark"
+						   type="submit" value="Delete"/>
+				</form>
+			</th>
+		</tr>
+	</table>
+	<a th:href="'/create-tariff'" class="btn btn-outline-dark" role="button"
+	   aria-disabled="true">Add</a>
+</div>
+</body>
+</html>

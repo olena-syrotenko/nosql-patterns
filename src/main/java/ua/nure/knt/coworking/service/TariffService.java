@@ -1,34 +1,65 @@
 package ua.nure.knt.coworking.service;
 
+import org.springframework.stereotype.Service;
 import ua.nure.knt.coworking.dao.DaoFactory;
 import ua.nure.knt.coworking.dao.DaoType;
-import ua.nure.knt.coworking.dao.TariffDao;
 import ua.nure.knt.coworking.entity.Tariff;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class TariffService {
-	private final TariffDao tariffDao;
+	private final DaoFactory daoFactory;
 
-	public TariffService(DaoFactory daoFactory) throws SQLException {
-		tariffDao = DaoFactory.getDaoFactory(DaoType.MySQL)
-				.getTariffDao();
+	public TariffService() {
+		daoFactory = DaoFactory.getDaoFactory(DaoType.MySQL);
 	}
 
-	List<Tariff> readAllTariffs() throws SQLException {
-		return tariffDao.readAllTariffs();
+	public List<Tariff> readAllTariffs() {
+		try {
+			return daoFactory.getTariffDao()
+					.readAllTariffs();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	void saveTariff(Tariff user) throws SQLException {
-		tariffDao.createTariff(user);
+	public Tariff readTariffById(Integer id) {
+		try {
+			return daoFactory.getTariffDao()
+					.readTariffById(id);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	void updateTariff(Tariff user) throws SQLException {
-		tariffDao.updateTariff(user);
+	public void saveTariff(Tariff user) {
+		try {
+			daoFactory.getTariffDao()
+					.createTariff(user);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
-	void deleteTariff(Integer id) throws SQLException {
-		tariffDao.deleteTariffById(id);
+	public void updateTariff(Tariff user) {
+		try {
+			daoFactory.getTariffDao()
+					.updateTariff(user);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void deleteTariff(Integer id) {
+		try {
+			daoFactory.getTariffDao()
+					.deleteTariffById(id);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }
