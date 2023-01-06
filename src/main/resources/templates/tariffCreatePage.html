@@ -17,7 +17,7 @@
 	</style>
 </head>
 <body>
-<th:block th:include="/navBar"></th:block>
+<th:block th:include="/navBar"/>
 <form th:action="@{/create-tariff}" th:object="${tariffForm}" class="block" method="post">
 	<div class="form-group">
 		<label for="inputName">Tariff name</label>

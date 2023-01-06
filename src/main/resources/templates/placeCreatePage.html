@@ -17,7 +17,7 @@
 	</style>
 </head>
 <body>
-<th:block th:include="/navBar"></th:block>
+<th:block th:include="/navBar"/>
 <form th:action="@{/create-place}" th:object="${placeForm}" class="block" method="post">
 	<div class="form-group">
 		<label for="inputNumber">Place number</label>
