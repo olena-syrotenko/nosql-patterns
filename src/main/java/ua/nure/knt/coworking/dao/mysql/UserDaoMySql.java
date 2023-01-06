@@ -4,6 +4,7 @@ import org.bson.Document;
 import ua.nure.knt.coworking.dao.UserDao;
 import ua.nure.knt.coworking.entity.Role;
 import ua.nure.knt.coworking.entity.User;
+import ua.nure.knt.coworking.observers.Observer;
 import ua.nure.knt.coworking.util.RoleBuilder;
 import ua.nure.knt.coworking.util.UserBuilder;
 
@@ -18,6 +19,7 @@ import java.util.List;
 
 public class UserDaoMySql implements UserDao {
 	private final Connection connection;
+	private final List<Observer> userDaoObservers = new ArrayList<>();
 
 	// READ
 	private static final String GET_USER_BY_EMAIL = "SELECT user.id, email, password, last_name, first_name, passport_id, phone_number, role.name FROM user JOIN role ON id_role = role.id WHERE email = ?";
@@ -171,6 +173,7 @@ public class UserDaoMySql implements UserDao {
 
 			int updatedRows = ps.executeUpdate();
 			ps.close();
+			notify("User profile was updated: " + user);
 			return updatedRows;
 		} catch (SQLException exception) {
 			return null;
@@ -237,4 +240,22 @@ public class UserDaoMySql implements UserDao {
 				.build();
 	}
 
+	@Override
+	public void attach(Observer observer) {
+		if (observer != null) {
+			userDaoObservers.add(observer);
+		}
+	}
+
+	@Override
+	public void detach(Observer observer) {
+		if (observer != null) {
+			userDaoObservers.remove(observer);
+		}
+	}
+
+	@Override
+	public void notify(String notificationMessage) {
+		userDaoObservers.forEach(observer -> observer.update(notificationMessage));
+	}
 }

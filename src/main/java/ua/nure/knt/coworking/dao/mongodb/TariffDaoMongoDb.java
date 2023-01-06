@@ -13,6 +13,7 @@ import org.bson.conversions.Bson;
 import ua.nure.knt.coworking.dao.TariffDao;
 import ua.nure.knt.coworking.entity.Service;
 import ua.nure.knt.coworking.entity.Tariff;
+import ua.nure.knt.coworking.observers.Observer;
 import ua.nure.knt.coworking.util.RoomTypeBuilder;
 import ua.nure.knt.coworking.util.ServiceBuilder;
 import ua.nure.knt.coworking.util.TariffBuilder;
@@ -289,5 +290,20 @@ public class TariffDaoMongoDb implements TariffDao {
 				.stream()
 				.map(Service::getName)
 				.collect(Collectors.toList())));
+	}
+
+	@Override
+	public void attach(Observer observer) {
+
+	}
+
+	@Override
+	public void detach(Observer observer) {
+
+	}
+
+	@Override
+	public void notify(String notificationMessage) {
+
 	}
 }

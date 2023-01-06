@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import ua.nure.knt.coworking.entity.Place;
 import ua.nure.knt.coworking.observers.ContentObserver;
-import ua.nure.knt.coworking.observers.LoggerObserver;
-import ua.nure.knt.coworking.observers.ModificationObservable;
 import ua.nure.knt.coworking.service.PlaceService;
 
 import java.util.List;
@@ -20,16 +18,10 @@ import java.util.List;
 @Controller
 public class PlaceController {
 	private final PlaceService placeService;
-	private final ModificationObservable placeObservable;
-	private final ContentObserver contentObserver;
 
 	@Autowired
 	public PlaceController(PlaceService placeService) {
 		this.placeService = placeService;
-		this.placeObservable = new ModificationObservable();
-		this.contentObserver = new ContentObserver();
-		placeObservable.attach(new LoggerObserver());
-		placeObservable.attach(contentObserver);
 	}
 
 	@GetMapping("/places")
@@ -56,25 +48,19 @@ public class PlaceController {
 
 	@PostMapping("/create-place")
 	String createPlace(@ModelAttribute Place placeForm, Model model) {
-		placeService.savePlace(placeForm);
-		placeObservable.notify("New place " + placeForm + " was added");
-		model.addAttribute("infoMessage", contentObserver.getModel().getAttribute("content"));
+		placeService.savePlace(placeForm, new ContentObserver(model));
 		return "messagePage";
 	}
 
 	@PostMapping("/update-place/{id}")
 	String updatePlace(@PathVariable Integer id, @ModelAttribute Place placeForm, Model model) {
-		placeService.updatePlace(placeForm);
-		placeObservable.notify("Place " + id + " was updated: " + placeForm);
-		model.addAttribute("infoMessage", contentObserver.getModel().getAttribute("content"));
+		placeService.updatePlace(placeForm, new ContentObserver(model));
 		return "messagePage";
 	}
 
 	@PostMapping("/delete-place/{id}")
 	String deletePlace(@PathVariable Integer id, Model model) {
-		placeService.deletePlace(id);
-		placeObservable.notify("Place " + id + " was deleted");
-		model.addAttribute("infoMessage", contentObserver.getModel().getAttribute("content"));
-		return "redirect:/places";
+		placeService.deletePlace(id, new ContentObserver(model));
+		return "messagePage";
 	}
 }

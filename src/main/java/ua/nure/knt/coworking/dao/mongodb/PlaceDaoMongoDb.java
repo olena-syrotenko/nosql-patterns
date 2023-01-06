@@ -11,6 +11,7 @@ import org.bson.conversions.Bson;
 import ua.nure.knt.coworking.constants.StatusEnum;
 import ua.nure.knt.coworking.dao.PlaceDao;
 import ua.nure.knt.coworking.entity.Place;
+import ua.nure.knt.coworking.observers.Observer;
 import ua.nure.knt.coworking.util.PlaceBuilder;
 import ua.nure.knt.coworking.util.RoomBuilder;
 import ua.nure.knt.coworking.util.RoomTypeBuilder;
@@ -151,5 +152,20 @@ public class PlaceDaoMongoDb implements PlaceDao {
 				.getName()), Updates.set("room.type", place.getRoom()
 				.getRoomType()
 				.getName()));
+	}
+
+	@Override
+	public void attach(Observer observer) {
+
+	}
+
+	@Override
+	public void detach(Observer observer) {
+
+	}
+
+	@Override
+	public void notify(String notificationMessage) {
+
 	}
 }

@@ -4,6 +4,7 @@ import ua.nure.knt.coworking.dao.PlaceDao;
 import ua.nure.knt.coworking.entity.Place;
 import ua.nure.knt.coworking.entity.Room;
 import ua.nure.knt.coworking.entity.RoomType;
+import ua.nure.knt.coworking.observers.Observer;
 import ua.nure.knt.coworking.util.PlaceBuilder;
 import ua.nure.knt.coworking.util.RoomBuilder;
 import ua.nure.knt.coworking.util.RoomTypeBuilder;
@@ -24,6 +25,7 @@ import java.util.Optional;
 
 public class PlaceDaoMySql implements PlaceDao {
 	private final Connection connection;
+	private final List<Observer> placeDaoObservers = new ArrayList<>();
 
 	// READ
 	private static final String GET_PLACE_BY_ROOM_NAME = "SELECT place.id, place.area, room.id, room.name, room_type.name FROM place JOIN room ON id_room = room.id JOIN room_type ON id_room_type = room_type.id WHERE room.name = ?";
@@ -268,5 +270,24 @@ public class PlaceDaoMySql implements PlaceDao {
 								.build())
 						.build())
 				.build();
+	}
+
+	@Override
+	public void attach(Observer observer) {
+		if (observer != null) {
+			placeDaoObservers.add(observer);
+		}
+	}
+
+	@Override
+	public void detach(Observer observer) {
+		if (observer != null) {
+			placeDaoObservers.remove(observer);
+		}
+	}
+
+	@Override
+	public void notify(String notificationMessage) {
+		placeDaoObservers.forEach(observer -> observer.update(notificationMessage));
 	}
 }

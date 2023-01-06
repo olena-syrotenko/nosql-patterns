@@ -2,11 +2,12 @@ package ua.nure.knt.coworking.dao;
 
 import ua.nure.knt.coworking.constants.StatusEnum;
 import ua.nure.knt.coworking.entity.RentApplication;
+import ua.nure.knt.coworking.observers.Observable;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public interface RentDao {
+public interface RentDao extends Observable {
 	List<RentApplication> readAllRentApplication() throws SQLException;
 
 	List<RentApplication> readAllRentApplicationByStatus(StatusEnum statusEnum) throws SQLException;

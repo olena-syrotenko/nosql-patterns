@@ -1,13 +1,12 @@
 package ua.nure.knt.coworking.observers;
 
 import org.springframework.ui.Model;
-import org.springframework.validation.support.BindingAwareModelMap;
 
 public class ContentObserver implements Observer {
-	private final Model model = new BindingAwareModelMap();
+	private final Model model;
 
-	public Model getModel() {
-		return model;
+	public ContentObserver(Model model) {
+		this.model = model;
 	}
 
 	@Override

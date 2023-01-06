@@ -3,12 +3,13 @@ package ua.nure.knt.coworking.dao;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bson.Document;
 import ua.nure.knt.coworking.entity.Tariff;
+import ua.nure.knt.coworking.observers.Observable;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-public interface TariffDao {
+public interface TariffDao extends Observable {
 	List<Tariff> readAllTariffs() throws SQLException;
 
 	List<Tariff> readTariffByRoomType(String roomTypeName) throws SQLException;

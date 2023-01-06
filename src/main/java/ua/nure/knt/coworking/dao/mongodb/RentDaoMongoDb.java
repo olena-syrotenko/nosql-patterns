@@ -9,6 +9,7 @@ import org.bson.Document;
 import ua.nure.knt.coworking.constants.StatusEnum;
 import ua.nure.knt.coworking.dao.RentDao;
 import ua.nure.knt.coworking.entity.RentApplication;
+import ua.nure.knt.coworking.observers.Observer;
 import ua.nure.knt.coworking.util.PlaceBuilder;
 import ua.nure.knt.coworking.util.RentApplicationBuilder;
 import ua.nure.knt.coworking.util.RentPlaceBuilder;
@@ -184,5 +185,20 @@ public class RentDaoMongoDb implements RentDao {
 	private Date convertToDate(LocalDateTime localDateTime) {
 		return Date.from(localDateTime.atZone(ZoneId.systemDefault())
 				.toInstant());
+	}
+
+	@Override
+	public void attach(Observer observer) {
+
+	}
+
+	@Override
+	public void detach(Observer observer) {
+
+	}
+
+	@Override
+	public void notify(String notificationMessage) {
+
 	}
 }

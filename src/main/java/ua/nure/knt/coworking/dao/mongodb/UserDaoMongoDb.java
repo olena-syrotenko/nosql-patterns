@@ -10,6 +10,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import ua.nure.knt.coworking.dao.UserDao;
 import ua.nure.knt.coworking.entity.User;
+import ua.nure.knt.coworking.observers.Observer;
 import ua.nure.knt.coworking.util.RoleBuilder;
 import ua.nure.knt.coworking.util.UserBuilder;
 
@@ -155,5 +156,20 @@ public class UserDaoMongoDb implements UserDao {
 		return Updates.combine(Updates.set("password", user.getPassword()), Updates.set("last_name", user.getLastName()),
 				Updates.set("first_name", user.getFirstName()), Updates.set("passport_id", user.getPassportId()),
 				Updates.set("phone_number", user.getPhoneNumber()));
+	}
+
+	@Override
+	public void attach(Observer observer) {
+
+	}
+
+	@Override
+	public void detach(Observer observer) {
+
+	}
+
+	@Override
+	public void notify(String notificationMessage) {
+
 	}
 }

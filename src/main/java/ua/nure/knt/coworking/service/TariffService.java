@@ -3,7 +3,10 @@ package ua.nure.knt.coworking.service;
 import org.springframework.stereotype.Service;
 import ua.nure.knt.coworking.dao.DaoFactory;
 import ua.nure.knt.coworking.dao.DaoType;
+import ua.nure.knt.coworking.dao.TariffDao;
 import ua.nure.knt.coworking.entity.Tariff;
+import ua.nure.knt.coworking.observers.ContentObserver;
+import ua.nure.knt.coworking.observers.LoggerObserver;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -36,28 +39,34 @@ public class TariffService {
 		}
 	}
 
-	public void saveTariff(Tariff user) {
+	public void saveTariff(Tariff user, ContentObserver contentObserver) {
 		try {
-			daoFactory.getTariffDao()
-					.createTariff(user);
+			TariffDao tariffDao = daoFactory.getTariffDao();
+			tariffDao.attach(new LoggerObserver());
+			tariffDao.attach(contentObserver);
+			tariffDao.createTariff(user);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void updateTariff(Tariff user) {
+	public void updateTariff(Tariff user, ContentObserver contentObserver) {
 		try {
-			daoFactory.getTariffDao()
-					.updateTariff(user);
+			TariffDao tariffDao = daoFactory.getTariffDao();
+			tariffDao.attach(new LoggerObserver());
+			tariffDao.attach(contentObserver);
+			tariffDao.updateTariff(user);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void deleteTariff(Integer id) {
+	public void deleteTariff(Integer id, ContentObserver contentObserver) {
 		try {
-			daoFactory.getTariffDao()
-					.deleteTariffById(id);
+			TariffDao tariffDao = daoFactory.getTariffDao();
+			tariffDao.attach(new LoggerObserver());
+			tariffDao.attach(contentObserver);
+			tariffDao.deleteTariffById(id);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

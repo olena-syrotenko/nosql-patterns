@@ -4,7 +4,10 @@ import org.springframework.stereotype.Service;
 import ua.nure.knt.coworking.constants.StatusEnum;
 import ua.nure.knt.coworking.dao.DaoFactory;
 import ua.nure.knt.coworking.dao.DaoType;
+import ua.nure.knt.coworking.dao.RentDao;
 import ua.nure.knt.coworking.entity.RentApplication;
+import ua.nure.knt.coworking.observers.ContentObserver;
+import ua.nure.knt.coworking.observers.LoggerObserver;
 import ua.nure.knt.coworking.util.StatusBuilder;
 
 import java.sql.SQLException;
@@ -38,21 +41,25 @@ public class RentService {
 		}
 	}
 
-	public void saveRentApplication(RentApplication rentApplication) {
+	public void saveRentApplication(RentApplication rentApplication, ContentObserver contentObserver) {
 		try {
 			rentApplication.setStatus(new StatusBuilder().setName(StatusEnum.NEW.getStatus())
 					.build());
-			daoFactory.getRentDao()
-					.createRentApplication(rentApplication);
+			RentDao rentDao = daoFactory.getRentDao();
+			rentDao.attach(new LoggerObserver());
+			rentDao.attach(contentObserver);
+			rentDao.createRentApplication(rentApplication);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void updateRentApplicationStatus(RentApplication rentApplication) {
+	public void updateRentApplicationStatus(RentApplication rentApplication, ContentObserver contentObserver) {
 		try {
-			daoFactory.getRentDao()
-					.updateRentApplicationStatus(rentApplication);
+			RentDao rentDao = daoFactory.getRentDao();
+			rentDao.attach(new LoggerObserver());
+			rentDao.attach(contentObserver);
+			rentDao.updateRentApplicationStatus(rentApplication);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

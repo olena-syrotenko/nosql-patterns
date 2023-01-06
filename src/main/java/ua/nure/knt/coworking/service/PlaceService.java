@@ -3,7 +3,10 @@ package ua.nure.knt.coworking.service;
 import org.springframework.stereotype.Service;
 import ua.nure.knt.coworking.dao.DaoFactory;
 import ua.nure.knt.coworking.dao.DaoType;
+import ua.nure.knt.coworking.dao.PlaceDao;
 import ua.nure.knt.coworking.entity.Place;
+import ua.nure.knt.coworking.observers.ContentObserver;
+import ua.nure.knt.coworking.observers.LoggerObserver;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -48,28 +51,34 @@ public class PlaceService {
 		}
 	}
 
-	public void savePlace(Place place) {
+	public void savePlace(Place place, ContentObserver contentObserver) {
 		try {
-			daoFactory.getPlaceDao()
-					.createPlace(place);
+			PlaceDao placeDao = daoFactory.getPlaceDao();
+			placeDao.attach(new LoggerObserver());
+			placeDao.attach(contentObserver);
+			placeDao.createPlace(place);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void updatePlace(Place place) {
+	public void updatePlace(Place place, ContentObserver contentObserver) {
 		try {
-			daoFactory.getPlaceDao()
-					.updatePlace(place);
+			PlaceDao placeDao = daoFactory.getPlaceDao();
+			placeDao.attach(new LoggerObserver());
+			placeDao.attach(contentObserver);
+			placeDao.updatePlace(place);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void deletePlace(Integer id) {
+	public void deletePlace(Integer id, ContentObserver contentObserver) {
 		try {
-			daoFactory.getPlaceDao()
-					.deletePlaceById(id);
+			PlaceDao placeDao = daoFactory.getPlaceDao();
+			placeDao.attach(new LoggerObserver());
+			placeDao.attach(contentObserver);
+			placeDao.deletePlaceById(id);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

@@ -1,12 +1,13 @@
 package ua.nure.knt.coworking.dao;
 
 import ua.nure.knt.coworking.entity.Place;
+import ua.nure.knt.coworking.observers.Observable;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface PlaceDao {
+public interface PlaceDao extends Observable {
 	List<Place> readPlaceByRoomName(String roomName) throws SQLException;
 	List<Place> readAvailablePlace(LocalDate dateFrom, LocalDate dateTo, String roomType) throws SQLException;
 	List<Place> readAllPlaces() throws SQLException;

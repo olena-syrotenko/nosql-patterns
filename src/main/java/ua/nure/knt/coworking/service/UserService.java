@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import ua.nure.knt.coworking.constants.RoleEnum;
 import ua.nure.knt.coworking.dao.DaoFactory;
 import ua.nure.knt.coworking.dao.DaoType;
+import ua.nure.knt.coworking.dao.UserDao;
 import ua.nure.knt.coworking.entity.User;
+import ua.nure.knt.coworking.observers.ContentObserver;
+import ua.nure.knt.coworking.observers.LoggerObserver;
 import ua.nure.knt.coworking.util.RoleBuilder;
 
 import java.sql.SQLException;
@@ -61,21 +64,25 @@ public class UserService {
 		}
 	}
 
-	public void saveUser(User user) {
+	public void saveUser(User user, ContentObserver contentObserver) {
 		try {
 			user.setRole(new RoleBuilder().setName(RoleEnum.ROLE_USER.name())
 					.build());
-			daoFactory.getUserDao()
-					.createUser(user);
+			UserDao userDao = daoFactory.getUserDao();
+			userDao.attach(new LoggerObserver());
+			userDao.attach(contentObserver);
+			userDao.createUser(user);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void updateUser(User user) {
+	public void updateUser(User user, ContentObserver contentObserver) {
 		try {
-			daoFactory.getUserDao()
-					.updateUser(user);
+			UserDao userDao = daoFactory.getUserDao();
+			userDao.attach(new LoggerObserver());
+			userDao.attach(contentObserver);
+			userDao.updateUser(user);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

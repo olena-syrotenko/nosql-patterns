@@ -8,6 +8,7 @@ import ua.nure.knt.coworking.entity.RoomType;
 import ua.nure.knt.coworking.entity.Service;
 import ua.nure.knt.coworking.entity.Tariff;
 import ua.nure.knt.coworking.entity.TimeUnit;
+import ua.nure.knt.coworking.observers.Observer;
 import ua.nure.knt.coworking.util.RoomTypeBuilder;
 import ua.nure.knt.coworking.util.ServiceBuilder;
 import ua.nure.knt.coworking.util.TariffBuilder;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 public class TariffDaoMySql implements TariffDao {
 	private final Connection connection;
+	private final List<Observer> tariffDaoObservers = new ArrayList<>();
 
 	// READ
 	private static final String GET_ALL_TARIFFS = "SELECT tariff.id, tariff.name, duration, id_room_type, room_type.name, price FROM tariff JOIN time_unit ON id_time_unit = time_unit.id JOIN room_type ON room_type.id = id_room_type";
@@ -216,6 +218,7 @@ public class TariffDaoMySql implements TariffDao {
 			keys.close();
 			ps.close();
 			connection.commit();
+			notify("New tariff " + tariff + " was added");
 			return insertTariffId;
 		} catch (SQLException exception) {
 			connection.rollback();
@@ -259,6 +262,7 @@ public class TariffDaoMySql implements TariffDao {
 			}
 
 			connection.commit();
+			notify("Tariff " + tariff.getId() + " was updated: " + tariff);
 			return updatedRows;
 		} catch (SQLException exception) {
 			connection.rollback();
@@ -277,6 +281,7 @@ public class TariffDaoMySql implements TariffDao {
 
 			int deletedRows = ps.executeUpdate();
 			ps.close();
+			notify("Tariff " + id + " was deleted");
 			return deletedRows;
 		} catch (SQLException exception) {
 			return null;
@@ -377,5 +382,24 @@ public class TariffDaoMySql implements TariffDao {
 			tariffs.add(extractTariffFromResultSet(rs));
 		}
 		return tariffs;
+	}
+
+	@Override
+	public void attach(Observer observer) {
+		if (observer != null) {
+			tariffDaoObservers.add(observer);
+		}
+	}
+
+	@Override
+	public void detach(Observer observer) {
+		if (observer != null) {
+			tariffDaoObservers.remove(observer);
+		}
+	}
+
+	@Override
+	public void notify(String notificationMessage) {
+		tariffDaoObservers.forEach(observer -> observer.update(notificationMessage));
 	}
 }

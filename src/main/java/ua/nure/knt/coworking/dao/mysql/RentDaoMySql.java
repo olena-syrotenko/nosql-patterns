@@ -6,6 +6,7 @@ import ua.nure.knt.coworking.dao.RentDao;
 import ua.nure.knt.coworking.entity.RentApplication;
 import ua.nure.knt.coworking.entity.RentPlace;
 import ua.nure.knt.coworking.entity.Status;
+import ua.nure.knt.coworking.observers.Observer;
 import ua.nure.knt.coworking.util.PlaceBuilder;
 import ua.nure.knt.coworking.util.RentApplicationBuilder;
 import ua.nure.knt.coworking.util.RentPlaceBuilder;
@@ -29,6 +30,7 @@ import java.util.Optional;
 
 public class RentDaoMySql implements RentDao {
 	private final Connection connection;
+	private final List<Observer> rentDaoObservers = new ArrayList<>();
 
 	// READ
 	private static final String GET_RENT_APPLICATION_BY_STATUS = "SELECT rent_application.id, create_date, last_change, lease_agreement, status.name, user.email, user.passport_id, user.last_name, user.first_name, rent_amount FROM rent_application JOIN status ON id_status = status.id JOIN user ON id_user = user.id WHERE status.name = ?";
@@ -182,6 +184,7 @@ public class RentDaoMySql implements RentDao {
 			keys.close();
 			ps.close();
 			connection.commit();
+			notify("New rent application " + rentApplication + " was created");
 			return insertRentApplicationId;
 		} catch (SQLException exception) {
 			connection.rollback();
@@ -200,6 +203,7 @@ public class RentDaoMySql implements RentDao {
 			ps.setInt(2, rentApplication.getId());
 			int updatedRows = ps.executeUpdate();
 			ps.close();
+			notify("Status of rent application was updated: " + rentApplication);
 			return updatedRows;
 		} catch (SQLException exception) {
 			return null;
@@ -313,5 +317,24 @@ public class RentDaoMySql implements RentDao {
 			rentApplications.add(extractRentApplicationFromResultSet(rs));
 		}
 		return rentApplications;
+	}
+
+	@Override
+	public void attach(Observer observer) {
+		if (observer != null) {
+			rentDaoObservers.add(observer);
+		}
+	}
+
+	@Override
+	public void detach(Observer observer) {
+		if (observer != null) {
+			rentDaoObservers.remove(observer);
+		}
+	}
+
+	@Override
+	public void notify(String notificationMessage) {
+		rentDaoObservers.forEach(observer -> observer.update(notificationMessage));
 	}
 }

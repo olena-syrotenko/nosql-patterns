@@ -77,6 +77,7 @@ public class User {
 	@Override
 	public String toString() {
 		return "User{" + "id=" + id + ", email='" + email + '\'' + ", lastName='" + lastName + '\'' + ", firstName='"
-				+ firstName + '\'' + ", passportId='" + passportId + '\'' + ", phoneNumber='" + phoneNumber + '\'' + ", role=" + role.getName() + '}';
+				+ firstName + '\'' + ", passportId='" + passportId + '\'' + ", phoneNumber='" + phoneNumber + '\'' +
+				(role == null ? "" : ", role=" + role.getName()) + '}';
 	}
 }
