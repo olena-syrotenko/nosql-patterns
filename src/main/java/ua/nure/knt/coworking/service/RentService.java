@@ -1,34 +1,60 @@
 package ua.nure.knt.coworking.service;
 
+import org.springframework.stereotype.Service;
+import ua.nure.knt.coworking.constants.StatusEnum;
 import ua.nure.knt.coworking.dao.DaoFactory;
 import ua.nure.knt.coworking.dao.DaoType;
-import ua.nure.knt.coworking.dao.RentDao;
 import ua.nure.knt.coworking.entity.RentApplication;
+import ua.nure.knt.coworking.util.StatusBuilder;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class RentService {
-	private final RentDao rentDao;
+	private final DaoFactory daoFactory;
 
-	public RentService(DaoFactory daoFactory) throws SQLException {
-		rentDao = DaoFactory.getDaoFactory(DaoType.MySQL)
-				.getRentDao();
+	public RentService() throws SQLException {
+		daoFactory = DaoFactory.getDaoFactory(DaoType.MySQL);
 	}
 
-	List<RentApplication> readAllApplications() throws SQLException {
-		return rentDao.readAllRentApplication();
+	public List<RentApplication> readAllApplications() {
+		try {
+			return daoFactory.getRentDao()
+					.readAllRentApplication();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	List<RentApplication> readAllUserApplications(String email) throws SQLException {
-		return rentDao.readAllRentApplicationByUser(email);
+	public List<RentApplication> readAllUserApplications(String email) {
+		try {
+			return daoFactory.getRentDao()
+					.readAllRentApplicationByUser(email);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	void saveRentApplication(RentApplication rentApplication) throws SQLException {
-		rentDao.createRentApplication(rentApplication);
+	public void saveRentApplication(RentApplication rentApplication) {
+		try {
+			rentApplication.setStatus(new StatusBuilder().setName(StatusEnum.NEW.getStatus())
+					.build());
+			daoFactory.getRentDao()
+					.createRentApplication(rentApplication);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
-	void updateRentApplicationStatus(RentApplication rentApplication) throws SQLException {
-		rentDao.updateRentApplicationStatus(rentApplication);
+	public void updateRentApplicationStatus(RentApplication rentApplication) {
+		try {
+			daoFactory.getRentDao()
+					.updateRentApplicationStatus(rentApplication);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }

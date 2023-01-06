@@ -53,8 +53,8 @@ public class RentPlace {
 
 	@Override
 	public String toString() {
-		return "RentPlace{" + "place=№" + place.getId() + " in room №" + place.getRoom()
+		return "№" + place.getId() + " in room №" + place.getRoom()
 				.getId() + " " + StringUtils.defaultIfBlank(place.getRoom()
-				.getName(), "") + ", rentStart=" + rentStart + ", rentEnd=" + rentEnd + ", rentAmount=" + rentAmount + ", tariff=" + tariff.getName() + '}';
+				.getName(), "") + ", from " + rentStart + " to " + rentEnd + ", rentAmount " + rentAmount + ", tariff " + tariff.getName();
 	}
 }

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Create rent application</title>
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css}" rel="stylesheet"
+		  integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+	<style>
+		.block {
+			width: 80%;
+			margin: auto;
+		}
+
+		.form-control {
+			width: 20%;
+		}
+	</style>
+</head>
+<body>
+<th:block th:include="/navBar"></th:block>
+<form th:action="@{/create-application}" th:object="${rentApplicationForm}" class="block" method="post">
+	<div class="form-group">
+		<label for="inputEmail">Email</label>
+		<input type="text" class="form-control" id="inputEmail" placeholder="test@mail.com" th:field="*{user}" required>
+	</div>
+	<div class="form-group">
+		<label for="rentPlaces">Rent places</label>
+		<input type="text" class="form-control" id="rentPlaces" placeholder="12,2022-12-20,2022-12-25,Open Space - Day;" th:field="*{rentPlaces}" required>
+	</div>
+	<button type="submit" class="btn btn-outline-dark">Add</button>
+</form>
+</body>
+</html>

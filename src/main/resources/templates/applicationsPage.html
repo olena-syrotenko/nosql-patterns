@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Applications</title>
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+<th:block th:include="/navBar"></th:block>
+<div class="container">
+	<div>
+		<h2>Applications</h2>
+	</div>
+	<table class="table table-striped">
+		<tr>
+			<th>Number</th>
+			<th>Create date</th>
+			<th>Status</th>
+			<th>User</th>
+			<th>Rent amount</th>
+			<th>Lease agreement</th>
+			<th>Rent places</th>
+			<th></th>
+		</tr>
+		<tr th:each="rentApplication : ${rentApplications}">
+			<td th:utext="${rentApplication.id}">..</td>
+			<td th:utext="${rentApplication.createDate}">..</td>
+			<td th:utext="${rentApplication.status.name}">..</td>
+			<td th:utext="${rentApplication.user.email}">..</td>
+			<td th:utext="${rentApplication.rentAmount}">..</td>
+			<td th:utext="${rentApplication.leaseAgreement}">..</td>
+			<td>
+				<ul th:each="rentPlace : ${rentApplication.rentPlaces}">
+					<li th:text="${rentPlace.toString()}"></li>
+				</ul>
+			</td>
+			<th>
+				<form th:action="@{/update-application}" method="post" th:if="${rentApplication.status.name == 'New'}">
+					<input class="btn btn-outline-dark" name="status" th:value="Confirmed" hidden/>
+					<input class="btn btn-outline-dark" name="id" th:value="${rentApplication.id}" hidden/>
+					<button class="btn btn-outline-dark" type="submit">Підтвердити</button>
+				</form>
+				<form th:action="@{/update-application}" method="post" th:if="${rentApplication.status.name == 'New'}">
+					<input class="btn btn-outline-dark" name="status" th:value="Rejected" hidden/>
+					<input class="btn btn-outline-dark" name="id" th:value="${rentApplication.id}" hidden/>
+					<button class="btn btn-outline-dark" type="submit">Відхилити</button>
+				</form>
+				<form th:action="@{/update-application}" method="post"
+					  th:if="${rentApplication.status.name == 'New' || rentApplication.status.name == 'Confirmed'}">
+					<input class="btn btn-outline-dark" name="status" th:value="Cancelled" hidden/>
+					<input class="btn btn-outline-dark" name="id" th:value="${rentApplication.id}" hidden/>
+					<button class="btn btn-outline-dark" type="submit">Скасувати</button>
+				</form>
+				<form th:action="@{/update-application}" method="post" th:if="${rentApplication.status.name == 'Confirmed'}">
+					<input class="btn btn-outline-dark" name="status" th:value="Paid" hidden/>
+					<input class="btn btn-outline-dark" name="id" th:value="${rentApplication.id}" hidden/>
+					<button class="btn btn-outline-dark" type="submit">Сплатити</button>
+				</form>
+			</th>
+		</tr>
+	</table>
+	<a th:href="'/create-application'" class="btn btn-outline-dark" role="button"
+	   aria-disabled="true">Add</a>
+</div>
+</body>
+</html>
