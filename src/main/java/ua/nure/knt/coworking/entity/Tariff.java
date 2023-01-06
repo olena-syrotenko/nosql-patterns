@@ -1,5 +1,7 @@
 package ua.nure.knt.coworking.entity;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,8 +63,9 @@ public class Tariff {
 
 	@Override
 	public String toString() {
-		return "Tariff{" + "id=" + id + ", name='" + name + '\'' + ", price=" + price + ", timeUnit=" + timeUnit.getName() + ", roomType=" + roomType.getName()
-				+ ", services=" + services.stream()
+		return "Tariff{ name='" + name + '\'' + ", price=" + price + (timeUnit == null ? "" : ", timeUnit=" + timeUnit.getName()) +
+				(roomType == null ?	"" : ", roomType=" + roomType.getName()) + ", services=" + CollectionUtils.emptyIfNull(services)
+				.stream()
 				.map(Service::getName)
 				.collect(Collectors.joining(", ")) + '}';
 	}

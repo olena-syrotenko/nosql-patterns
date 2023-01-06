@@ -31,7 +31,7 @@ public class Place {
 
 	@Override
 	public String toString() {
-		return "Place{" + "id=" + id + ", area=" + area + ", room=№" + room.getId() + ' ' + room.getName() + ", " + room.getRoomType()
-				.getName() + '}';
+		return "Place{ number = " + id + ", area=" + area + ", room=№" + (room == null ? " " : room.getId() + ' ' + room.getName() + ", " + room.getRoomType()
+				.getName() )+'}';
 	}
 }

@@ -80,10 +80,15 @@ public class RentApplication {
 
 	@Override
 	public String toString() {
-		return "RentApplication{" + "id=" + id + ", createDate=" + createDate + ", lastChange=" + lastChange + ", leaseAgreement='" + leaseAgreement + '\''
-				+ ", status=" + status.getName() + ", user=" + user.getEmail() + ", rentAmount=" + rentAmount + ", rentPlaces="
+		return "RentApplication{" + "id=" + id + ( createDate == null ? "" : ", createDate=" + createDate) +
+				(lastChange == null ? "" : ", lastChange=" + lastChange) +
+				(leaseAgreement == null ? "" : ", leaseAgreement='" + leaseAgreement) + '\''
+				+ ", status=" + status.getName() +
+				(user == null ? "" : ", user=" + user.getEmail()) +
+				(rentAmount == null ? "" : ", rentAmount=" + rentAmount) +
+				(rentPlaces == null ? "" : ", rentPlaces="
 				+ rentPlaces.stream()
 				.map(RentPlace::toString)
-				.collect(Collectors.joining(", ")) + '}';
+				.collect(Collectors.joining(", "))) + '}';
 	}
 }
