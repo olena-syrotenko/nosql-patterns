@@ -8,8 +8,12 @@
 <body>
 <th:block th:include="/navBar"/>
 <div class="container">
-	<div>
+	<div class = "d-flex flex-row justify-content-lg-around">
 		<h2>Tariffs</h2>
+		<form th:action="'/undo-update-tariff'" method="post">
+			<input class="btn btn-outline-dark"
+				   type="submit" value="Cancel changes"/>
+		</form>
 	</div>
 	<table class="table table-striped">
 		<tr>
@@ -41,8 +45,8 @@
 			</th>
 		</tr>
 	</table>
-	<a th:href="'/create-tariff'" class="btn btn-outline-dark" role="button"
-	   aria-disabled="true">Add</a>
+		<a th:href="'/create-tariff'" class="btn btn-outline-dark" role="button"
+		   aria-disabled="true">Add</a>
 </div>
 </body>
 </html>

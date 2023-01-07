@@ -1,6 +1,7 @@
 package ua.nure.knt.coworking.entity;
 
 import org.apache.commons.collections4.CollectionUtils;
+import ua.nure.knt.coworking.util.TariffMemento;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,6 +60,19 @@ public class Tariff {
 
 	public void setServices(List<Service> services) {
 		this.services = services;
+	}
+
+	public TariffMemento saveState() {
+		return new TariffMemento(this);
+	}
+
+	public void restoreState(TariffMemento tariffMemento) {
+		this.id = tariffMemento.getState().id;
+		this.name = tariffMemento.getState().name;
+		this.price = tariffMemento.getState().price;
+		this.timeUnit = tariffMemento.getState().timeUnit;
+		this.roomType = tariffMemento.getState().roomType;
+		this.services = tariffMemento.getState().services;
 	}
 
 	@Override
