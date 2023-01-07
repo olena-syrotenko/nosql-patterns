@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import ua.nure.knt.coworking.entity.Role;
 import ua.nure.knt.coworking.entity.User;
 import ua.nure.knt.coworking.observers.ContentObserver;
 import ua.nure.knt.coworking.service.UserService;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class UserController {
@@ -55,6 +58,29 @@ public class UserController {
 	@PostMapping("/user/{id}")
 	String updateUser(@PathVariable Integer id, @ModelAttribute User userForm, Model model) {
 		userService.updateUser(userForm, new ContentObserver(model));
+		return "messagePage";
+	}
+
+	@GetMapping(value = "/login")
+	public String loginUser(Model model) {
+		User userForm = new User();
+		model.addAttribute("userForm", userForm);
+		return "loginPage";
+	}
+
+	@PostMapping(value = "/login")
+	public String loginUser(@ModelAttribute User userForm, HttpSession session, Model model) {
+		Optional<User> user = Optional.ofNullable(userService.readUserByEmail(userForm.getEmail()));
+		if (userForm.getPassword()
+				.equals(user.map(User::getPassword)
+						.orElse(null))) {
+			session.setAttribute("userRole", user.map(User::getRole)
+					.map(Role::getName)
+					.orElse("No role"));
+			model.addAttribute("content", "Success authorization");
+		} else {
+			model.addAttribute("content", "Fail authorization. Try it again");
+		}
 		return "messagePage";
 	}
 }
