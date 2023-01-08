@@ -77,11 +77,12 @@ public class UserController {
 						.orElse(null))) {
 			session.setAttribute("userRole", user.map(User::getRole)
 					.map(Role::getName)
-					.orElse("No role"));
+					.orElse("Unknown role"));
 			model.addAttribute("content", "Success authorization");
+			return "messagePage";
 		} else {
-			model.addAttribute("content", "Fail authorization. Try it again");
+			model.addAttribute("error", "Fail authorization. Try it again");
+			return "errorPage";
 		}
-		return "messagePage";
 	}
 }

@@ -4,20 +4,27 @@
 	<meta charset="UTF-8">
 	<title>Login</title>
 	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css}" rel="stylesheet">
+	<style>
+		.form-control {
+			width: 20%;
+		}
+	</style>
 </head>
 <body>
 <th:block th:include="/navBar"/>
-<form th:action="@{/login}" th:object="${userForm}" method="post">
-	<div class="form-group">
-		<label for="exampleInputEmail1">Email address</label>
-		<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" th:field="*{email}" required>
-		<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-	</div>
-	<div class="form-group">
-		<label for="exampleInputPassword1">Password</label>
-		<input type="password" class="form-control" id="exampleInputPassword1" th:field="*{password}" required>
-	</div>
-	<button type="submit" class="btn btn-primary">Log In</button>
-</form>
+<div class="container">
+	<form th:action="@{/login}" th:object="${userForm}" method="post">
+		<div class="form-group">
+			<label for="exampleInputEmail1">Email address</label>
+			<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" th:field="*{email}" required>
+			<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+		</div>
+		<div class="form-group">
+			<label for="exampleInputPassword1">Password</label>
+			<input type="text" class="form-control" id="exampleInputPassword1" th:field="*{password}" required>
+		</div>
+		<button type="submit" class="btn btn-primary">Log In</button>
+	</form>
+</div>
 </body>
 </html>

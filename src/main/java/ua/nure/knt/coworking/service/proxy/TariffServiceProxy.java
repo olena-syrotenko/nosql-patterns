@@ -5,14 +5,15 @@ import ua.nure.knt.coworking.entity.Tariff;
 import ua.nure.knt.coworking.exceptions.AccessDenied;
 import ua.nure.knt.coworking.observers.ContentObserver;
 import ua.nure.knt.coworking.service.ITariffService;
+import ua.nure.knt.coworking.service.implementations.TariffService;
 
 import java.util.List;
 
 public class TariffServiceProxy implements ITariffService {
-	private final ITariffService tariffService;
+	private final TariffService tariffService;
 
-	public TariffServiceProxy(ITariffService tariffService) {
-		this.tariffService = tariffService;
+	public TariffServiceProxy() {
+		this.tariffService = new TariffService();
 	}
 
 	@Override

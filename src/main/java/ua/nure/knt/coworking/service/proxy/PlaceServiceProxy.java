@@ -5,14 +5,15 @@ import ua.nure.knt.coworking.entity.Place;
 import ua.nure.knt.coworking.exceptions.AccessDenied;
 import ua.nure.knt.coworking.observers.ContentObserver;
 import ua.nure.knt.coworking.service.IPlaceService;
+import ua.nure.knt.coworking.service.implementations.PlaceService;
 
 import java.util.List;
 
 public class PlaceServiceProxy implements IPlaceService {
-	private final IPlaceService placeService;
+	private final PlaceService placeService;
 
-	public PlaceServiceProxy(IPlaceService placeService) {
-		this.placeService = placeService;
+	public PlaceServiceProxy() {
+		this.placeService = new PlaceService();
 	}
 
 	@Override
