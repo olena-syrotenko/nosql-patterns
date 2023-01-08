@@ -1,4 +1,4 @@
-package ua.nure.knt.coworking.service;
+package ua.nure.knt.coworking.service.implementations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,13 +9,14 @@ import ua.nure.knt.coworking.dao.UserDao;
 import ua.nure.knt.coworking.entity.User;
 import ua.nure.knt.coworking.observers.ContentObserver;
 import ua.nure.knt.coworking.observers.LoggerObserver;
+import ua.nure.knt.coworking.service.IUserService;
 import ua.nure.knt.coworking.util.RoleBuilder;
 
 import java.sql.SQLException;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements IUserService {
 	private final DaoFactory daoFactory;
 
 	@Autowired
@@ -87,5 +88,4 @@ public class UserService {
 			e.printStackTrace();
 		}
 	}
-
 }

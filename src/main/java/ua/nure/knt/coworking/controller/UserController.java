@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import ua.nure.knt.coworking.entity.Role;
 import ua.nure.knt.coworking.entity.User;
 import ua.nure.knt.coworking.observers.ContentObserver;
-import ua.nure.knt.coworking.service.UserService;
+import ua.nure.knt.coworking.service.IUserService;
+import ua.nure.knt.coworking.service.ServiceFactory;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -20,11 +21,11 @@ import java.util.Optional;
 
 @Controller
 public class UserController {
-	private final UserService userService;
+	private final IUserService userService;
 
 	@Autowired
-	public UserController(UserService userService) {
-		this.userService = userService;
+	public UserController() {
+		this.userService = ServiceFactory.getUserService();
 	}
 
 	@GetMapping(value = "/registration")

@@ -10,18 +10,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import ua.nure.knt.coworking.entity.Place;
+import ua.nure.knt.coworking.exceptions.AccessDenied;
 import ua.nure.knt.coworking.observers.ContentObserver;
-import ua.nure.knt.coworking.service.PlaceService;
+import ua.nure.knt.coworking.service.IPlaceService;
+import ua.nure.knt.coworking.service.ServiceFactory;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
 public class PlaceController {
-	private final PlaceService placeService;
+	private final IPlaceService placeService;
 
 	@Autowired
-	public PlaceController(PlaceService placeService) {
-		this.placeService = placeService;
+	public PlaceController() {
+		this.placeService = ServiceFactory.getPlaceService();
 	}
 
 	@GetMapping("/places")
@@ -47,20 +50,35 @@ public class PlaceController {
 	}
 
 	@PostMapping("/create-place")
-	String createPlace(@ModelAttribute Place placeForm, Model model) {
-		placeService.savePlace(placeForm, new ContentObserver(model));
+	String createPlace(@ModelAttribute Place placeForm, Model model, HttpSession session) {
+		try {
+			placeService.savePlace(placeForm, (String) session.getAttribute("userRole"), new ContentObserver(model));
+		} catch (AccessDenied accessDenied) {
+			model.addAttribute("error", accessDenied.getMessage());
+			return "errorPage";
+		}
 		return "messagePage";
 	}
 
 	@PostMapping("/update-place/{id}")
-	String updatePlace(@PathVariable Integer id, @ModelAttribute Place placeForm, Model model) {
-		placeService.updatePlace(placeForm, new ContentObserver(model));
+	String updatePlace(@PathVariable Integer id, @ModelAttribute Place placeForm, Model model, HttpSession session) {
+		try {
+			placeService.updatePlace(placeForm, (String) session.getAttribute("userRole"), new ContentObserver(model));
+		} catch (AccessDenied accessDenied) {
+			model.addAttribute("error", accessDenied.getMessage());
+			return "errorPage";
+		}
 		return "messagePage";
 	}
 
 	@PostMapping("/delete-place/{id}")
-	String deletePlace(@PathVariable Integer id, Model model) {
-		placeService.deletePlace(id, new ContentObserver(model));
+	String deletePlace(@PathVariable Integer id, Model model, HttpSession session) {
+		try {
+			placeService.deletePlace(id, (String) session.getAttribute("userRole"), new ContentObserver(model));
+		} catch (AccessDenied accessDenied) {
+			model.addAttribute("error", accessDenied.getMessage());
+			return "errorPage";
+		}
 		return "messagePage";
 	}
 }

@@ -1,7 +1,6 @@
 package ua.nure.knt.coworking.controller;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import ua.nure.knt.coworking.caretakers.TariffCaretaker;
 import ua.nure.knt.coworking.dto.TariffDto;
 import ua.nure.knt.coworking.entity.Tariff;
+import ua.nure.knt.coworking.exceptions.AccessDenied;
 import ua.nure.knt.coworking.observers.ContentObserver;
-import ua.nure.knt.coworking.service.TariffService;
+import ua.nure.knt.coworking.service.ITariffService;
+import ua.nure.knt.coworking.service.ServiceFactory;
 import ua.nure.knt.coworking.util.ConverterUtil;
 
 import javax.servlet.http.HttpSession;
@@ -20,11 +21,10 @@ import java.util.List;
 
 @Controller
 public class TariffController {
-	private final TariffService tariffService;
+	private final ITariffService tariffService;
 
-	@Autowired
-	public TariffController(TariffService tariffService) {
-		this.tariffService = tariffService;
+	public TariffController() {
+		this.tariffService = ServiceFactory.getTariffService();
 	}
 
 	@GetMapping("/tariffs")
@@ -49,8 +49,13 @@ public class TariffController {
 	}
 
 	@PostMapping("/create-tariff")
-	String createTariff(@ModelAttribute TariffDto tariffForm, Model model) {
-		tariffService.saveTariff(ConverterUtil.toEntity(tariffForm), new ContentObserver(model));
+	String createTariff(@ModelAttribute TariffDto tariffForm, Model model, HttpSession session) {
+		try {
+			tariffService.saveTariff(ConverterUtil.toEntity(tariffForm), (String) session.getAttribute("userRole"), new ContentObserver(model));
+		} catch (AccessDenied accessDenied) {
+			model.addAttribute("error", accessDenied.getMessage());
+			return "errorPage";
+		}
 		return "messagePage";
 	}
 
@@ -62,24 +67,34 @@ public class TariffController {
 		tariffCaretaker.saveState(((Tariff) session.getAttribute("tariffToUpdate")).saveState());
 		session.setAttribute("tariffCaretaker", tariffCaretaker);
 
-		tariffService.updateTariff(tariff, new ContentObserver(model));
+		try {
+			tariffService.updateTariff(tariff, (String) session.getAttribute("userRole"), new ContentObserver(model));
+		} catch (AccessDenied accessDenied) {
+			model.addAttribute("error", accessDenied.getMessage());
+			return "errorPage";
+		}
 		return "messagePage";
 	}
 
 	@PostMapping("/undo-update-tariff")
-	String undoUpdateTariff(HttpSession session) {
+	String undoUpdateTariff(HttpSession session, Model model) {
 		TariffCaretaker tariffCaretaker = (TariffCaretaker) session.getAttribute("tariffCaretaker");
 		if (tariffCaretaker != null && !tariffCaretaker.isEmpty()) {
 			Tariff tariff = new Tariff();
 			tariff.restoreState(tariffCaretaker.restoreState());
-			tariffService.updateTariff(tariff, null);
+			tariffService.updateTariff(tariff, (String) session.getAttribute("userRole"), null);
 		}
 		return "redirect:/tariffs";
 	}
 
 	@PostMapping("/delete-tariff/{id}")
-	String deleteTariff(@PathVariable Integer id, Model model) {
-		tariffService.deleteTariff(id, new ContentObserver(model));
+	String deleteTariff(@PathVariable Integer id, Model model, HttpSession session) {
+		try {
+			tariffService.deleteTariff(id, (String) session.getAttribute("userRole"), new ContentObserver(model));
+		} catch (AccessDenied accessDenied) {
+			model.addAttribute("error", accessDenied.getMessage());
+			return "errorPage";
+		}
 		return "messagePage";
 	}
 }

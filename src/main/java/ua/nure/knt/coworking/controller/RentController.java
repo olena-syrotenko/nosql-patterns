@@ -10,18 +10,19 @@ import ua.nure.knt.coworking.constants.StatusEnum;
 import ua.nure.knt.coworking.dto.RentApplicationDto;
 import ua.nure.knt.coworking.entity.RentApplication;
 import ua.nure.knt.coworking.observers.ContentObserver;
-import ua.nure.knt.coworking.service.RentService;
+import ua.nure.knt.coworking.service.IRentService;
+import ua.nure.knt.coworking.service.ServiceFactory;
 import ua.nure.knt.coworking.util.ConverterUtil;
 
 import java.util.List;
 
 @Controller
 public class RentController {
-	private final RentService rentService;
+	private final IRentService rentService;
 
 	@Autowired
-	public RentController(RentService rentService) {
-		this.rentService = rentService;
+	public RentController() {
+		this.rentService = ServiceFactory.getRentService();
 	}
 
 	@GetMapping("/applications")

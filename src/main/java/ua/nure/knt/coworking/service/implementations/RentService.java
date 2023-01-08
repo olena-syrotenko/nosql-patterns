@@ -1,4 +1,4 @@
-package ua.nure.knt.coworking.service;
+package ua.nure.knt.coworking.service.implementations;
 
 import org.springframework.stereotype.Service;
 import ua.nure.knt.coworking.constants.StatusEnum;
@@ -8,16 +8,17 @@ import ua.nure.knt.coworking.dao.RentDao;
 import ua.nure.knt.coworking.entity.RentApplication;
 import ua.nure.knt.coworking.observers.ContentObserver;
 import ua.nure.knt.coworking.observers.LoggerObserver;
+import ua.nure.knt.coworking.service.IRentService;
 import ua.nure.knt.coworking.util.StatusBuilder;
 
 import java.sql.SQLException;
 import java.util.List;
 
 @Service
-public class RentService {
+public class RentService implements IRentService {
 	private final DaoFactory daoFactory;
 
-	public RentService() throws SQLException {
+	public RentService() {
 		daoFactory = DaoFactory.getDaoFactory(DaoType.MySQL);
 	}
 
