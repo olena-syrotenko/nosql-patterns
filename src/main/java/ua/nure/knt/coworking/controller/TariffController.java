@@ -77,7 +77,7 @@ public class TariffController {
 	}
 
 	@PostMapping("/undo-update-tariff")
-	String undoUpdateTariff(HttpSession session, Model model) {
+	String undoUpdateTariff(HttpSession session) {
 		TariffCaretaker tariffCaretaker = (TariffCaretaker) session.getAttribute("tariffCaretaker");
 		if (tariffCaretaker != null && !tariffCaretaker.isEmpty()) {
 			Tariff tariff = new Tariff();
